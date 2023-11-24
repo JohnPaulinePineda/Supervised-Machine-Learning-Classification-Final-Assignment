@@ -164,6 +164,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PowerTransformer
 from sklearn.preprocessing import StandardScaler
 from scipy import stats
+
+from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score
+from sklearn.model_selection import train_test_split
 ```
 
 
@@ -780,6 +783,23 @@ display(cancer_rate.describe(include='category').transpose())
   </tbody>
 </table>
 </div>
+
+
+
+```python
+##################################
+# Performing a general exploration of the response variable
+##################################
+cancer_rate.CANRAT.value_counts(normalize = True)
+```
+
+
+
+
+    Low     0.745763
+    High    0.254237
+    Name: CANRAT, dtype: float64
+
 
 
 ## 1.3. Data Quality Assessment <a class="anchor" id="1.3"></a>
@@ -4145,91 +4165,91 @@ for column in cancer_rate_imputed_numeric:
 
 
     
-![png](output_121_0.png)
+![png](output_122_0.png)
     
 
 
 
     
-![png](output_121_1.png)
+![png](output_122_1.png)
     
 
 
 
     
-![png](output_121_2.png)
+![png](output_122_2.png)
     
 
 
 
     
-![png](output_121_3.png)
+![png](output_122_3.png)
     
 
 
 
     
-![png](output_121_4.png)
+![png](output_122_4.png)
     
 
 
 
     
-![png](output_121_5.png)
+![png](output_122_5.png)
     
 
 
 
     
-![png](output_121_6.png)
+![png](output_122_6.png)
     
 
 
 
     
-![png](output_121_7.png)
+![png](output_122_7.png)
     
 
 
 
     
-![png](output_121_8.png)
+![png](output_122_8.png)
     
 
 
 
     
-![png](output_121_9.png)
+![png](output_122_9.png)
     
 
 
 
     
-![png](output_121_10.png)
+![png](output_122_10.png)
     
 
 
 
     
-![png](output_121_11.png)
+![png](output_122_11.png)
     
 
 
 
     
-![png](output_121_12.png)
+![png](output_122_12.png)
     
 
 
 
     
-![png](output_121_13.png)
+![png](output_122_13.png)
     
 
 
 
     
-![png](output_121_14.png)
+![png](output_122_14.png)
     
 
 
@@ -4461,7 +4481,7 @@ plt.show()
 
 
     
-![png](output_126_0.png)
+![png](output_127_0.png)
     
 
 
@@ -4498,7 +4518,7 @@ plot_correlation_matrix(cancer_rate_imputed_numeric_correlation,mask)
 
 
     
-![png](output_128_0.png)
+![png](output_129_0.png)
     
 
 
@@ -4595,79 +4615,79 @@ for column in cancer_rate_transformed_numeric:
 
 
     
-![png](output_134_0.png)
+![png](output_135_0.png)
     
 
 
 
     
-![png](output_134_1.png)
+![png](output_135_1.png)
     
 
 
 
     
-![png](output_134_2.png)
+![png](output_135_2.png)
     
 
 
 
     
-![png](output_134_3.png)
+![png](output_135_3.png)
     
 
 
 
     
-![png](output_134_4.png)
+![png](output_135_4.png)
     
 
 
 
     
-![png](output_134_5.png)
+![png](output_135_5.png)
     
 
 
 
     
-![png](output_134_6.png)
+![png](output_135_6.png)
     
 
 
 
     
-![png](output_134_7.png)
+![png](output_135_7.png)
     
 
 
 
     
-![png](output_134_8.png)
+![png](output_135_8.png)
     
 
 
 
     
-![png](output_134_9.png)
+![png](output_135_9.png)
     
 
 
 
     
-![png](output_134_10.png)
+![png](output_135_10.png)
     
 
 
 
     
-![png](output_134_11.png)
+![png](output_135_11.png)
     
 
 
 
     
-![png](output_134_12.png)
+![png](output_135_12.png)
     
 
 
@@ -4757,73 +4777,73 @@ for column in cancer_rate_scaled_numeric:
 
 
     
-![png](output_140_0.png)
+![png](output_141_0.png)
     
 
 
 
     
-![png](output_140_1.png)
+![png](output_141_1.png)
     
 
 
 
     
-![png](output_140_2.png)
+![png](output_141_2.png)
     
 
 
 
     
-![png](output_140_3.png)
+![png](output_141_3.png)
     
 
 
 
     
-![png](output_140_4.png)
+![png](output_141_4.png)
     
 
 
 
     
-![png](output_140_5.png)
+![png](output_141_5.png)
     
 
 
 
     
-![png](output_140_6.png)
+![png](output_141_6.png)
     
 
 
 
     
-![png](output_140_7.png)
+![png](output_141_7.png)
     
 
 
 
     
-![png](output_140_8.png)
+![png](output_141_8.png)
     
 
 
 
     
-![png](output_140_9.png)
+![png](output_141_9.png)
     
 
 
 
     
-![png](output_140_10.png)
+![png](output_141_10.png)
     
 
 
 
     
-![png](output_140_11.png)
+![png](output_141_11.png)
     
 
 
@@ -4945,6 +4965,7 @@ cancer_rate_preprocessed_categorical_combined = cancer_rate_preprocessed_categor
 cancer_rate_preprocessed = cancer_rate_preprocessed.drop(cancer_rate_categorical_encoded.columns, axis=1) 
 cancer_rate_preprocessed_predictors = cancer_rate_preprocessed.columns
 cancer_rate_preprocessed_combined = cancer_rate_preprocessed.join(cancer_rate_preprocessed_target)
+cancer_rate_preprocessed_all = cancer_rate_preprocessed_combined.join(cancer_rate_categorical_encoded)
 ```
 
 
@@ -5005,7 +5026,7 @@ plt.show()
 
 
     
-![png](output_152_0.png)
+![png](output_153_0.png)
     
 
 
@@ -5062,7 +5083,7 @@ plt.show()
 
 
     
-![png](output_153_0.png)
+![png](output_154_0.png)
     
 
 
@@ -5293,6 +5314,141 @@ display(cancer_rate_preprocessed_categorical_summary.sort_values(by=['ChiSquare.
 ## 1.6. Model Development With Hyperparameter Tuning <a class="anchor" id="1.6"></a>
 
 ### 1.6.1 Premodelling Data Description <a class="anchor" id="1.6.1"></a>
+
+
+```python
+##################################
+# Consolidating relevant numeric columns
+# and encoded categorical columns
+# after hypothesis testing
+##################################
+cancer_rate_premodelling = cancer_rate_preprocessed_all.drop(['AGRLND','POPDEN','GHGEMI','POPGRO','FORARE','HDICAT_H','HDICAT_M','HDICAT_L'], axis=1)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the filtered dataset
+##################################
+print('Dataset Dimensions: ')
+display(cancer_rate_premodelling.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (163, 9)
+
+
+
+```python
+##################################
+# Listing the column names and data types
+##################################
+print('Column Names and Data Types:')
+display(cancer_rate_premodelling.dtypes)
+```
+
+    Column Names and Data Types:
+    
+
+
+    URBPOP        float64
+    LIFEXP        float64
+    TUBINC        float64
+    DTHCMD        float64
+    CO2EMI        float64
+    GDPCAP        float64
+    EPISCO        float64
+    CANRAT       category
+    HDICAT_VH       uint8
+    dtype: object
+
+
+
+```python
+##################################
+# Gathering the pairplot for all variables
+##################################
+sns.pairplot(cancer_rate_premodelling, kind='reg')
+plt.show()
+```
+
+
+    
+![png](output_165_0.png)
+    
+
+
+
+```python
+##################################
+# Separating the target 
+# and predictor columns
+##################################
+X = cancer_rate_premodelling.drop('CANRAT', axis = 1)
+y = cancer_rate_premodelling.CANRAT
+```
+
+
+```python
+##################################
+# Formulating the train and test data
+# using a 70-30 ratio
+##################################
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state= 88888888)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the train dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_train.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (114, 8)
+
+
+
+```python
+##################################
+# Performing a general exploration of the train dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_test.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (49, 8)
+
+
+
+```python
+##################################
+# Defining a function to compute
+# model performance
+##################################
+def model_performance_evaluation(y_true, y_pred):
+    metric_name = ['Accuracy','Precision','Recall','F1','AUROC']
+    metric_value = [accuracy_score(y_true, y_pred),
+                   precision_score(y_true, y_pred),
+                   recall_score(y_true, y_pred),
+                   f1_score(y_true, y_pred),
+                   roc_auc_score(y_true, y_pred)]    
+    metric_summary = pd.DataFrame(zip(metric_name, metric_value),
+                                  columns=['metric_name','metric_value']) 
+    return(metric_summary)
+```
 
 ### 1.6.2 Logistic Regression <a class="anchor" id="1.6.2"></a>
 

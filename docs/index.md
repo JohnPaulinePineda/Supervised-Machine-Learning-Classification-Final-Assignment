@@ -26,29 +26,25 @@
         * [1.6.2 Logistic Regression](#1.6.2)
         * [1.6.3 Decision Trees](#1.6.3)
         * [1.6.4 Random Forest](#1.6.4)
-        * [1.6.5 Naive Bayes](#1.6.5)
-        * [1.6.6 Support Vector Machine](#1.6.6)
+        * [1.6.5 Support Vector Machine](#1.6.5)
     * [1.7 Model Development With Class Weights](#1.7)
         * [1.7.1 Premodelling Data Description](#1.7.1)
         * [1.7.2 Logistic Regression](#1.7.2)
         * [1.7.3 Decision Trees](#1.7.3)
         * [1.7.4 Random Forest](#1.7.4)
-        * [1.7.5 Naive Bayes](#1.7.5)
-        * [1.7.6 Support Vector Machine](#1.7.6)
+        * [1.7.5 Support Vector Machine](#1.7.5)
     * [1.8 Model Development With SMOTE Upsampling](#1.8)
         * [1.8.1 Premodelling Data Description](#1.8.1)
         * [1.8.2 Logistic Regression](#1.8.2)
         * [1.8.3 Decision Trees](#1.8.3)
         * [1.8.4 Random Forest](#1.8.4)
-        * [1.8.5 Naive Bayes](#1.8.5)
-        * [1.8.6 Support Vector Machine](#1.8.6)
+        * [1.8.5 Support Vector Machine](#1.8.5)
     * [1.9 Model Development With CNN Downsampling](#1.9)
         * [1.9.1 Premodelling Data Description](#1.9.1)
         * [1.9.2 Logistic Regression](#1.9.2)
         * [1.9.3 Decision Trees](#1.9.3)
         * [1.9.4 Random Forest](#1.9.4)
-        * [1.9.5 Naive Bayes](#1.9.5)
-        * [1.9.6 Support Vector Machine](#1.9.6)
+        * [1.9.5 Support Vector Machine](#1.9.5)
     * [1.10 Model Development With Stacking Ensemble Learning](#1.10)
         * [1.9.1 Premodelling Data Description](#1.9.1)
         * [1.9.2 Logistic Regression](#1.9.1)
@@ -164,6 +160,7 @@ from scipy import stats
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 ```
@@ -6180,23 +6177,1327 @@ display(optimal_random_forest_performance_test)
 </div>
 
 
-### 1.6.5 Naive Bayes <a class="anchor" id="1.6.5"></a>
+### 1.6.5 Support Vector Machine <a class="anchor" id="1.6.6"></a>
 
-### 1.6.6 Support Vector Machine <a class="anchor" id="1.6.6"></a>
+[Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Support Vector Machine model
+##################################
+support_vector_machine = SVC()
+
+##################################
+# Defining the hyperparameters for the
+# Support Vector Machine model
+##################################
+hyperparameter_grid = {
+    'C': [1.0],
+    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Support Vector Machine model
+##################################
+optimal_support_vector_machine = GridSearchCV(estimator = support_vector_machine, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the optimal Support Vector Machine model
+##################################
+optimal_support_vector_machine.fit(X_train, y_train)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Support Vector Machine model
+##################################
+optimal_support_vector_machine.best_score_ 
+optimal_support_vector_machine.best_params_
+```
+
+
+
+
+    {'C': 1.0, 'class_weight': None, 'kernel': 'poly', 'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the optimal Support Vector Machine model
+# on the train set
+##################################
+optimal_support_vector_machine_y_hat_train = optimal_support_vector_machine.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+optimal_support_vector_machine_performance_train = model_performance_evaluation(y_train, optimal_support_vector_machine_y_hat_train)
+optimal_support_vector_machine_performance_train['model'] = ['optimal_support_vector_machine'] * 5
+optimal_support_vector_machine_performance_train['set'] = ['train'] * 5
+print('Optimal Support Vector Machine Model Performance on Train Data: ')
+display(optimal_support_vector_machine_performance_train)
+```
+
+    Optimal Support Vector Machine Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.947368</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.960000</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.827586</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.888889</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.907911</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the optimal Support Vector Machine model
+# on the test set
+##################################
+optimal_support_vector_machine_y_hat_test = optimal_support_vector_machine.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+optimal_support_vector_machine_performance_test = model_performance_evaluation(y_test, optimal_support_vector_machine_y_hat_test)
+optimal_support_vector_machine_performance_test['model'] = ['optimal_support_vector_machine'] * 5
+optimal_support_vector_machine_performance_test['set'] = ['test'] * 5
+print('Optimal Support Vector Machine Model Performance on Test Data: ')
+display(optimal_support_vector_machine_performance_test)
+```
+
+    Optimal Support Vector Machine Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.857143</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.857143</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.500000</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.631579</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.736486</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ## 1.7. Model Development With Class Weights <a class="anchor" id="1.7"></a>
 
+[Class weights](https://link.springer.com/book/10.1007/978-1-4614-6849-3?page=1) are used to assign different levels of importance to different classes when the distribution of instances across different classes in a classification problem is not equal. By assigning higher weights to the minority class, the model is encouraged to give more attention to correctly predicting instances from the minority class. Class weights are incorporated into the loss function during training. The loss for each instance is multiplied by its corresponding class weight. This means that misclassifying an instance from the minority class will have a greater impact on the overall loss than misclassifying an instance from the majority class. The use of class weights helps balance the influence of each class during training, mitigating the impact of class imbalance. It provides a way to focus the learning process on the classes that are underrepresented in the training data.
+
 ### 1.7.1 Premodelling Data Description <a class="anchor" id="1.7.1"></a>
+
+
+```python
+##################################
+# Consolidating relevant numeric columns
+# and encoded categorical columns
+# after hypothesis testing
+##################################
+cancer_rate_premodelling = cancer_rate_preprocessed_all.drop(['AGRLND','POPDEN','GHGEMI','POPGRO','FORARE','HDICAT_H','HDICAT_M','HDICAT_L'], axis=1)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the filtered dataset
+##################################
+print('Dataset Dimensions: ')
+display(cancer_rate_premodelling.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (163, 9)
+
+
+
+```python
+##################################
+# Listing the column names and data types
+##################################
+print('Column Names and Data Types:')
+display(cancer_rate_premodelling.dtypes)
+```
+
+    Column Names and Data Types:
+    
+
+
+    URBPOP        float64
+    LIFEXP        float64
+    TUBINC        float64
+    DTHCMD        float64
+    CO2EMI        float64
+    GDPCAP        float64
+    EPISCO        float64
+    CANRAT       category
+    HDICAT_VH       uint8
+    dtype: object
+
+
+
+```python
+##################################
+# Gathering the pairplot for all variables
+##################################
+sns.pairplot(cancer_rate_premodelling, kind='reg')
+plt.show()
+```
+
+
+    
+![png](output_194_0.png)
+    
+
+
+
+```python
+##################################
+# Separating the target 
+# and predictor columns
+##################################
+X = cancer_rate_premodelling.drop('CANRAT', axis = 1)
+y = cancer_rate_premodelling['CANRAT'].cat.codes
+```
+
+
+```python
+##################################
+# Formulating the train and test data
+# using a 70-30 ratio
+##################################
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state= 88888888, stratify=y)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the train dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_train.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (114, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the train dataset
+##################################
+y_train.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.745614
+    1    0.254386
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Performing a general exploration of the test dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_test.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (49, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the test dataset
+##################################
+y_test.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.755102
+    1    0.244898
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Defining a function to compute
+# model performance
+##################################
+def model_performance_evaluation(y_true, y_pred):
+    metric_name = ['Accuracy','Precision','Recall','F1','AUROC']
+    metric_value = [accuracy_score(y_true, y_pred),
+                   precision_score(y_true, y_pred),
+                   recall_score(y_true, y_pred),
+                   f1_score(y_true, y_pred),
+                   roc_auc_score(y_true, y_pred)]    
+    metric_summary = pd.DataFrame(zip(metric_name, metric_value),
+                                  columns=['metric_name','metric_value']) 
+    return(metric_summary)
+```
 
 ### 1.7.2 Logistic Regression <a class="anchor" id="1.7.2"></a>
 
+[Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Logistic Regression model
+##################################
+logistic_regression = LogisticRegression()
+
+##################################
+# Defining the hyperparameters for the
+# Logistic Regression model
+##################################
+hyperparameter_grid = {
+    'C': [1.0],
+    'penalty': ['l1', 'l2'],
+    'solver': ['liblinear','saga'],
+    'class_weight': [{0:0.25, 1:0.75}],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Logistic Regression model
+##################################
+weighted_logistic_regression = GridSearchCV(estimator = logistic_regression, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the weighted Logistic Regression model
+##################################
+weighted_logistic_regression.fit(X_train, y_train)
+
+##################################
+# Determining the weighted hyperparameter
+# for the Logistic Regression model
+##################################
+weighted_logistic_regression.best_score_ 
+weighted_logistic_regression.best_params_
+```
+
+
+
+
+    {'C': 1.0,
+     'class_weight': {0: 0.25, 1: 0.75},
+     'penalty': 'l2',
+     'random_state': 88888888,
+     'solver': 'liblinear'}
+
+
+
+
+```python
+##################################
+# Evaluating the weighted logistic regression model
+# on the train set
+##################################
+weighted_logistic_regression_y_hat_train = weighted_logistic_regression.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+weighted_logistic_regression_performance_train = model_performance_evaluation(y_train, weighted_logistic_regression_y_hat_train)
+weighted_logistic_regression_performance_train['model'] = ['weighted_logistic_regression'] * 5
+weighted_logistic_regression_performance_train['set'] = ['train'] * 5
+print('Weighted Logistic Regression Model Performance on Train Data: ')
+display(weighted_logistic_regression_performance_train)
+```
+
+    Weighted Logistic Regression Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.894737</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.707317</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.828571</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.929412</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the weighted logistic regression model
+# on the test set
+##################################
+weighted_logistic_regression_y_hat_test = weighted_logistic_regression.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+weighted_logistic_regression_performance_test = model_performance_evaluation(y_test, weighted_logistic_regression_y_hat_test)
+weighted_logistic_regression_performance_test['model'] = ['weighted_logistic_regression'] * 5
+weighted_logistic_regression_performance_test['set'] = ['test'] * 5
+print('Weighted Logistic Regression Model Performance on Test Data: ')
+display(weighted_logistic_regression_performance_test)
+```
+
+    Weighted Logistic Regression Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.938776</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.846154</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.916667</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.880000</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.931306</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 ### 1.7.3 Decision Trees <a class="anchor" id="1.7.3"></a>
+
+[Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
+
+
+```python
+##################################
+# Creating an instance of the 
+# Decision Tree model
+##################################
+decision_tree = DecisionTreeClassifier()
+
+##################################
+# Defining the hyperparameters for the
+# Decision Tree model
+##################################
+hyperparameter_grid = {
+    'criterion': ['gini','entropy','log_loss'],
+    'max_depth': [3,5,7],
+    'min_samples_leaf': [3,5,10],
+    'class_weight': [{0:0.25, 1:0.75}],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Decision Tree model
+##################################
+weighted_decision_tree = GridSearchCV(estimator = decision_tree, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the weighted Decision Tree model
+##################################
+weighted_decision_tree.fit(X_train, y_train)
+
+##################################
+# Determining the weighted hyperparameter
+# for the Decision Tree model
+##################################
+weighted_decision_tree.best_score_ 
+weighted_decision_tree.best_params_
+```
+
+
+
+
+    {'class_weight': {0: 0.25, 1: 0.75},
+     'criterion': 'gini',
+     'max_depth': 3,
+     'min_samples_leaf': 3,
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the weighted decision tree model
+# on the train set
+##################################
+weighted_decision_tree_y_hat_train = weighted_decision_tree.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+weighted_decision_tree_performance_train = model_performance_evaluation(y_train, weighted_decision_tree_y_hat_train)
+weighted_decision_tree_performance_train['model'] = ['weighted_decision_tree'] * 5
+weighted_decision_tree_performance_train['set'] = ['train'] * 5
+print('Weighted Decision Tree Model Performance on Train Data: ')
+display(weighted_decision_tree_performance_train)
+```
+
+    Weighted Decision Tree Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.956140</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.852941</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.920635</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.970588</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the weighted decision tree model
+# on the test set
+##################################
+weighted_decision_tree_y_hat_test = weighted_decision_tree.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+weighted_decision_tree_performance_test = model_performance_evaluation(y_test, weighted_decision_tree_y_hat_test)
+weighted_decision_tree_performance_test['model'] = ['weighted_decision_tree'] * 5
+weighted_decision_tree_performance_test['set'] = ['test'] * 5
+print('Weighted Decision Tree Model Performance on Test Data: ')
+display(weighted_decision_tree_performance_test)
+```
+
+    Weighted Decision Tree Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.769231</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.833333</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.800000</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.876126</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ### 1.7.4 Random Forest <a class="anchor" id="1.7.4"></a>
 
-### 1.7.5 Naive Bayes <a class="anchor" id="1.7.5"></a>
+[Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
 
-### 1.7.6 Support Vector Machine <a class="anchor" id="1.7.6"></a>
+
+```python
+##################################
+# Creating an instance of the 
+# Random Forest model
+##################################
+random_forest = RandomForestClassifier()
+
+##################################
+# Defining the hyperparameters for the
+# Random Forest model
+##################################
+hyperparameter_grid = {
+    'criterion': ['gini','entropy','log_loss'],
+    'max_depth': [3,5,7],
+    'min_samples_leaf': [3,5,10],
+    'n_estimators': [3,5,7],
+    'max_features':['sqrt', 'log2'],
+    'class_weight': [{0:0.25, 1:0.75}],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Random Forest model
+##################################
+weighted_random_forest = GridSearchCV(estimator = random_forest, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the weighted Random Forest model
+##################################
+weighted_random_forest.fit(X_train, y_train)
+
+##################################
+# Determining the weighted hyperparameter
+# for the Random Forest model
+##################################
+weighted_random_forest.best_score_ 
+weighted_random_forest.best_params_
+```
+
+
+
+
+    {'class_weight': {0: 0.25, 1: 0.75},
+     'criterion': 'entropy',
+     'max_depth': 3,
+     'max_features': 'sqrt',
+     'min_samples_leaf': 5,
+     'n_estimators': 3,
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the weighted Random Forest model
+# on the train set
+##################################
+weighted_random_forest_y_hat_train = weighted_random_forest.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+weighted_random_forest_performance_train = model_performance_evaluation(y_train, weighted_random_forest_y_hat_train)
+weighted_random_forest_performance_train['model'] = ['weighted_random_forest'] * 5
+weighted_random_forest_performance_train['set'] = ['train'] * 5
+print('Weighted Random Forest Model Performance on Train Data: ')
+display(weighted_random_forest_performance_train)
+```
+
+    Weighted Random Forest Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.929825</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.800000</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.875000</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.941582</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the weighted Random Forest model
+# on the test set
+##################################
+weighted_random_forest_y_hat_test = weighted_random_forest.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+weighted_random_forest_performance_test = model_performance_evaluation(y_test, weighted_random_forest_y_hat_test)
+weighted_random_forest_performance_test['model'] = ['weighted_random_forest'] * 5
+weighted_random_forest_performance_test['set'] = ['test'] * 5
+print('Weighted Random Forest Model Performance on Test Data: ')
+display(weighted_random_forest_performance_test)
+```
+
+    Weighted Random Forest Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.938776</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.909091</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.833333</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.869565</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.903153</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+### 1.7.5 Support Vector Machine <a class="anchor" id="1.7.6"></a>
+
+[Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Support Vector Machine model
+##################################
+support_vector_machine = SVC()
+
+##################################
+# Defining the hyperparameters for the
+# Support Vector Machine model
+##################################
+hyperparameter_grid = {
+    'C': [1.0],
+    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+    'class_weight': [{0:0.25, 1:0.75}],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Support Vector Machine model
+##################################
+weighted_support_vector_machine = GridSearchCV(estimator = support_vector_machine, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the weighted Support Vector Machine model
+##################################
+weighted_support_vector_machine.fit(X_train, y_train)
+
+##################################
+# Determining the weighted hyperparameter
+# for the Support Vector Machine model
+##################################
+weighted_support_vector_machine.best_score_ 
+weighted_support_vector_machine.best_params_
+```
+
+
+
+
+    {'C': 1.0,
+     'class_weight': {0: 0.25, 1: 0.75},
+     'kernel': 'poly',
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the weighted Support Vector Machine model
+# on the train set
+##################################
+weighted_support_vector_machine_y_hat_train = weighted_support_vector_machine.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+weighted_support_vector_machine_performance_train = model_performance_evaluation(y_train, weighted_support_vector_machine_y_hat_train)
+weighted_support_vector_machine_performance_train['model'] = ['weighted_support_vector_machine'] * 5
+weighted_support_vector_machine_performance_train['set'] = ['train'] * 5
+print('Weighted Support Vector Machine Model Performance on Train Data: ')
+display(weighted_support_vector_machine_performance_train)
+```
+
+    Weighted Support Vector Machine Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.964912</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.962963</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.896552</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.928571</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.942394</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the weighted Support Vector Machine model
+# on the test set
+##################################
+weighted_support_vector_machine_y_hat_test = weighted_support_vector_machine.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+weighted_support_vector_machine_performance_test = model_performance_evaluation(y_test, weighted_support_vector_machine_y_hat_test)
+weighted_support_vector_machine_performance_test['model'] = ['weighted_support_vector_machine'] * 5
+weighted_support_vector_machine_performance_test['set'] = ['test'] * 5
+print('Weighted Support Vector Machine Model Performance on Test Data: ')
+display(weighted_support_vector_machine_performance_test)
+```
+
+    Weighted Support Vector Machine Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.877551</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.875000</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.583333</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.700000</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.778153</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ## 1.8. Model Development With SMOTE Upsampling <a class="anchor" id="1.8"></a>
 
@@ -6204,13 +7505,19 @@ display(optimal_random_forest_performance_test)
 
 ### 1.8.2 Logistic Regression <a class="anchor" id="1.8.2"></a>
 
+[Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
 ### 1.8.3 Decision Trees <a class="anchor" id="1.8.3"></a>
+
+[Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
 
 ### 1.8.4 Random Forest <a class="anchor" id="1.8.4"></a>
 
-### 1.8.5 Naive Bayes <a class="anchor" id="1.8.5"></a>
+[Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
 
-### 1.8.6 Support Vector Machine <a class="anchor" id="1.8.6"></a>
+### 1.8.5 Support Vector Machine <a class="anchor" id="1.8.6"></a>
+
+[Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
 
 ## 1.9. Model Development With CNN Downsampling <a class="anchor" id="1.9"></a>
 
@@ -6218,19 +7525,27 @@ display(optimal_random_forest_performance_test)
 
 ### 1.9.2 Logistic Regression <a class="anchor" id="1.9.2"></a>
 
+[Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
 ### 1.9.3 Decision Trees <a class="anchor" id="1.9.3"></a>
+
+[Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
 
 ### 1.9.4 Random Forest <a class="anchor" id="1.9.4"></a>
 
-### 1.9.5 Naive Bayes <a class="anchor" id="1.9.5"></a>
+[Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
 
-### 1.9.6 Support Vector Machine <a class="anchor" id="1.9.6"></a>
+### 1.9.5 Support Vector Machine <a class="anchor" id="1.9.6"></a>
+
+[Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
 
 ## 1.10. Model Development With Stacking Ensemble Learning <a class="anchor" id="1.9"></a>
 
 ### 1.10.1 Premodelling Data Description <a class="anchor" id="1.10.1"></a>
 
 ### 1.10.2 Logistic Regression <a class="anchor" id="1.10.2"></a>
+
+[Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
 
 # 2. Summary <a class="anchor" id="Summary"></a>
 
@@ -6301,6 +7616,7 @@ display(optimal_random_forest_performance_test)
 * **[Publication]** [The Origins of Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) by JS Cramer (Econometrics eJournal)
 * **[Publication]** [Classification and Regression Trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) by Leo Breiman, Jerome Friedman, Richard Olshen and Charles Stone (Computer Science)
 * **[Publication]** [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) by Leo Breiman (Machine Learning)
+* **[Publication]** [A Training Algorithm for Optimal Margin Classifiers](https://dl.acm.org/doi/10.1145/130385.130401) by Bernhard Boser, Isabelle Guyon and Vladimir Vapnik (Proceedings of the Fifth Annual Workshop on Computational Learning Theory)
 
 ***
 

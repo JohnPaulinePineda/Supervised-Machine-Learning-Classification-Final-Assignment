@@ -60,13 +60,11 @@
 
 # 1. Table of Contents <a class="anchor" id="TOC"></a>
 
-This project explores the various methods in assessing **Data Quality**, implementing **Data Preprocessing** and conducting **Data Exploration** for prediction problems with categorical responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. A non-exhaustive list of methods to detect missing data, extreme outlying points, near-zero variance, multicollinearity, and skewed distributions were evaluated. Remedial procedures on addressing data quality issues including missing data imputation, centering and scaling transformation, shape transformation and outlier treatment were similarly considered, as applicable. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document.
+This project explores the various methods in assessing **Data Quality**, implementing **Data Preprocessing** and conducting **Data Exploration** for prediction problems with categorical responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. A non-exhaustive list of methods to detect missing data, extreme outlying points, near-zero variance, multicollinearity, and skewed distributions were evaluated. Remedial procedures on addressing data quality issues including missing data imputation, centering and scaling transformation, shape transformation and outlier treatment were similarly considered, as applicable. 
 
-[Data quality assessment](http://appliedpredictivemodeling.com/) involves profiling and assessing the data to understand its suitability for machine learning tasks. The quality of training data has a huge impact on the efficiency, accuracy and complexity of machine learning tasks. Data remains susceptible to errors or irregularities that may be introduced during collection, aggregation or annotation stage. Issues such as incorrect labels, synonymous categories in a categorical variable or heterogeneity in columns, among others, which might go undetected by standard pre-processing modules in these frameworks can lead to sub-optimal model performance, inaccurate analysis and unreliable decisions.
+This project implements different predictive modelling procedures for dichotomous categorical responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. Models applied in the analysis to predict dichotomous categorical responses included the **Logistic Regression**, **Decision Trees**, **Random Forest**, **Naive Bayes** and **Support Vector Machine** algorithms. Remedial procedures on addressing class imbalance including **Class Weighting**, **Synthetic Minority Oversampling Technique** and **Condensed Nearest Neighbors** were similarly considered, as applicable. Ensemble learning using **Stacking** which consolidate many different models types on the same data and using another model to learn how to best combine the predictions was also explored. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document.
 
-[Data preprocessing](http://appliedpredictivemodeling.com/) involves changing the raw feature vectors into a representation that is more suitable for the downstream modelling and estimation processes, including data cleaning, integration, reduction and transformation. Data cleaning aims to identify and correct errors in the dataset that may negatively impact a predictive model such as removing outliers, replacing missing values, smoothing noisy data, and correcting inconsistent data. Data integration addresses potential issues with redundant and inconsistent data obtained from multiple sources through approaches such as detection of tuple duplication and data conflict. The purpose of data reduction is to have a condensed representation of the data set that is smaller in volume, while maintaining the integrity of the original data set. Data transformation converts the data into the most appropriate form for data modeling.
-
-[Data exploration](http://appliedpredictivemodeling.com/) involves analyzing and investigating data sets to summarize their main characteristics, often employing data visualization methods. It helps determine how best to manipulate data sources to discover patterns, spot anomalies, test a hypothesis, or check assumptions. This process is primarily used to see what data can reveal beyond the formal modeling or hypothesis testing task and provides a better understanding of data set variables and the relationships between them.
+[Binary classification learning](https://link.springer.com/book/10.1007/978-1-4614-6849-3?page=1) refers to a predictive modelling problem where only two class labels are predicted for a given sample of input data. These models use the training data set and calculate how to best map instances of input data to the specific class labels. Typically, binary classification tasks involve one class that is the normal state (assigned the class label 0) and another class that is the abnormal state (assigned the class label 1). It is common to structure a binary classification task with a model that predicts a Bernoulli probability distribution for each instance. The Bernoulli distribution is a discrete probability distribution that covers a case where an event will have a binary outcome as either a 0 or 1. For a binary classification, this means that the model predicts a probability of an instance belonging to class 1, or the abnormal state. The algorithms applied in this study attempt to categorize the input data and form dichotomous groups based on their similarities.
 
 ## 1.1. Data Background <a class="anchor" id="1.1"></a>
 
@@ -165,8 +163,10 @@ from sklearn.preprocessing import PowerTransformer
 from sklearn.preprocessing import StandardScaler
 from scipy import stats
 
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 ```
 
 
@@ -5313,6 +5313,9 @@ display(cancer_rate_preprocessed_categorical_summary.sort_values(by=['ChiSquare.
 
 ## 1.6. Model Development With Hyperparameter Tuning <a class="anchor" id="1.6"></a>
 
+[Hyperparameter tuning](https://link.springer.com/book/10.1007/978-1-4614-6849-3?page=1) is an iterative process that involves experimenting with different hyperparameter combinations, evaluating the model's performance, and refining the hyperparameter values to achieve the best possible performance on new, unseen data - aimed at building effective and well-generalizing machine learning models. A model's performance depends not only on the learned parameters (weights) during training but also on hyperparameters, which are external configuration settings that cannot be learned from the data. 
+
+
 ### 1.6.1 Premodelling Data Description <a class="anchor" id="1.6.1"></a>
 
 
@@ -5388,7 +5391,7 @@ plt.show()
 # and predictor columns
 ##################################
 X = cancer_rate_premodelling.drop('CANRAT', axis = 1)
-y = cancer_rate_premodelling.CANRAT
+y = cancer_rate_premodelling['CANRAT'].cat.codes
 ```
 
 
@@ -5397,7 +5400,7 @@ y = cancer_rate_premodelling.CANRAT
 # Formulating the train and test data
 # using a 70-30 ratio
 ##################################
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state= 88888888)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state= 88888888, stratify=y)
 ```
 
 
@@ -5419,7 +5422,24 @@ display(X_train.shape)
 
 ```python
 ##################################
-# Performing a general exploration of the train dataset
+# Validating the class distribution of the train dataset
+##################################
+y_train.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.745614
+    1    0.254386
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Performing a general exploration of the test dataset
 ##################################
 print('Dataset Dimensions: ')
 display(X_test.shape)
@@ -5430,6 +5450,23 @@ display(X_test.shape)
 
 
     (49, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the test dataset
+##################################
+y_test.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.755102
+    1    0.244898
+    dtype: float64
+
 
 
 
@@ -5452,7 +5489,463 @@ def model_performance_evaluation(y_true, y_pred):
 
 ### 1.6.2 Logistic Regression <a class="anchor" id="1.6.2"></a>
 
+[Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Logistic Regression model
+##################################
+logistic_regression = LogisticRegression()
+
+##################################
+# Defining the hyperparameters for the
+# Logistic Regression model
+##################################
+hyperparameter_grid = {
+    'C': [1.0],
+    'penalty': ['l1', 'l2'],
+    'solver': ['liblinear','saga'],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Logistic Regression model
+##################################
+optimal_logistic_regression = GridSearchCV(estimator = logistic_regression, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the optimal Logistic Regression model
+##################################
+optimal_logistic_regression.fit(X_train, y_train)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Logistic Regression model
+##################################
+optimal_logistic_regression.best_score_ 
+optimal_logistic_regression.best_params_
+```
+
+
+
+
+    {'C': 1.0,
+     'class_weight': None,
+     'penalty': 'l1',
+     'random_state': 88888888,
+     'solver': 'liblinear'}
+
+
+
+
+```python
+##################################
+# Evaluating the optimal logistic regression model
+# on the train set
+##################################
+optimal_logistic_regression_y_hat_train = optimal_logistic_regression.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+optimal_logistic_regression_performance_train = model_performance_evaluation(y_train, optimal_logistic_regression_y_hat_train)
+optimal_logistic_regression_performance_train['model'] = ['optimal_logistic_regression'] * 5
+optimal_logistic_regression_performance_train['set'] = ['train'] * 5
+print('Optimal Logistic Regression Model Performance on Train Data: ')
+display(optimal_logistic_regression_performance_train)
+```
+
+    Optimal Logistic Regression Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.947368</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.870968</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.931034</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.900000</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.941988</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the optimal logistic regression model
+# on the test set
+##################################
+optimal_logistic_regression_y_hat_test = optimal_logistic_regression.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+optimal_logistic_regression_performance_test = model_performance_evaluation(y_test, optimal_logistic_regression_y_hat_test)
+optimal_logistic_regression_performance_test['model'] = ['optimal_logistic_regression'] * 5
+optimal_logistic_regression_performance_test['set'] = ['test'] * 5
+print('Optimal Logistic Regression Model Performance on Test Data: ')
+display(optimal_logistic_regression_performance_test)
+```
+
+    Optimal Logistic Regression Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 ### 1.6.3 Decision Trees <a class="anchor" id="1.6.3"></a>
+
+[Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
+
+
+```python
+##################################
+# Creating an instance of the 
+# Decision Tree model
+##################################
+decision_tree = DecisionTreeClassifier()
+
+##################################
+# Defining the hyperparameters for the
+# Decision Tree model
+##################################
+hyperparameter_grid = {
+    'criterion': ['gini','entropy','log_loss'],
+    'max_depth': [3,5,7],
+    'min_samples_leaf': [3,5,10],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Decision Tree model
+##################################
+optimal_decision_tree = GridSearchCV(estimator = decision_tree, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the optimal Decision Tree model
+##################################
+optimal_decision_tree.fit(X_train, y_train)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Decision Tree model
+##################################
+optimal_decision_tree.best_score_ 
+optimal_decision_tree.best_params_
+```
+
+
+
+
+    {'class_weight': None,
+     'criterion': 'entropy',
+     'max_depth': 5,
+     'min_samples_leaf': 3,
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the optimal decision tree model
+# on the train set
+##################################
+optimal_decision_tree_y_hat_train = optimal_decision_tree.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+optimal_decision_tree_performance_train = model_performance_evaluation(y_train, optimal_decision_tree_y_hat_train)
+optimal_decision_tree_performance_train['model'] = ['optimal_decision_tree'] * 5
+optimal_decision_tree_performance_train['set'] = ['train'] * 5
+print('Optimal Logistic Regression Model Performance on Train Data: ')
+display(optimal_decision_tree_performance_train)
+```
+
+    Optimal Logistic Regression Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.973684</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>1.000000</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.896552</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.945455</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.948276</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the optimal decision tree model
+# on the test set
+##################################
+optimal_decision_tree_y_hat_test = optimal_decision_tree.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+optimal_decision_tree_performance_test = model_performance_evaluation(y_test, optimal_decision_tree_y_hat_test)
+optimal_decision_tree_performance_test['model'] = ['optimal_decision_tree'] * 5
+optimal_decision_tree_performance_test['set'] = ['test'] * 5
+print('Optimal Logistic Regression Model Performance on Test Data: ')
+display(optimal_decision_tree_performance_test)
+```
+
+    Optimal Logistic Regression Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.857143</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.857143</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.500000</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.631579</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.736486</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ### 1.6.4 Random Forest <a class="anchor" id="1.6.4"></a>
 
@@ -5574,6 +6067,8 @@ def model_performance_evaluation(y_true, y_pred):
 * **[Publication]** [Multiple Imputation of Discrete and Continuous Data by Fully Conditional Specification](https://journals.sagepub.com/doi/10.1177/0962280206074463) by Stef van Buuren (Statistical Methods in Medical Research)
 * **[Publication]** [Mathematical Contributions to the Theory of Evolution: Regression, Heredity and Panmixia](https://royalsocietypublishing.org/doi/10.1098/rsta.1896.0007) by Karl Pearson (Royal Society)
 * **[Publication]** [A New Family of Power Transformations to Improve Normality or Symmetry](https://academic.oup.com/biomet/article-abstract/87/4/954/232908?redirectedFrom=fulltext&login=false) by In-Kwon Yeo and Richard Johnson (Biometrika)
+* **[Publication]** [The Origins of Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) by JS Cramer (Econometrics eJournal)
+* **[Publication]** [Classification and Regression Trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) by Leo Breiman, Jerome Friedman, Richard Olshen and Charles Stone (Computer Science)
 
 ***
 

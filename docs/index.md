@@ -177,6 +177,7 @@ from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import CondensedNearestNeighbour
+from sklearn.ensemble import StackingClassifier
 ```
 
 
@@ -8125,7 +8126,6 @@ upsampled_decision_tree_performance_test['model'] = ['upsampled_decision_tree'] 
 upsampled_decision_tree_performance_test['set'] = ['test'] * 5
 print('Upsampled Decision Tree Model Performance on Test Data: ')
 display(upsampled_decision_tree_performance_test)
-
 ```
 
     Upsampled Decision Tree Model Performance on Test Data: 
@@ -8660,29 +8660,3831 @@ display(upsampled_support_vector_machine_performance_test)
 
 ### 1.9.1 Premodelling Data Description <a class="anchor" id="1.9.1"></a>
 
+
+```python
+##################################
+# Consolidating relevant numeric columns
+# and encoded categorical columns
+# after hypothesis testing
+##################################
+cancer_rate_premodelling = cancer_rate_preprocessed_all.drop(['AGRLND','POPDEN','GHGEMI','POPGRO','FORARE','HDICAT_H','HDICAT_M','HDICAT_L'], axis=1)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the filtered dataset
+##################################
+print('Dataset Dimensions: ')
+display(cancer_rate_premodelling.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (163, 9)
+
+
+
+```python
+##################################
+# Listing the column names and data types
+##################################
+print('Column Names and Data Types:')
+display(cancer_rate_premodelling.dtypes)
+```
+
+    Column Names and Data Types:
+    
+
+
+    URBPOP        float64
+    LIFEXP        float64
+    TUBINC        float64
+    DTHCMD        float64
+    CO2EMI        float64
+    GDPCAP        float64
+    EPISCO        float64
+    CANRAT       category
+    HDICAT_VH       uint8
+    dtype: object
+
+
+
+```python
+##################################
+# Gathering the pairplot for all variables
+##################################
+sns.pairplot(cancer_rate_premodelling, kind='reg')
+plt.show()
+```
+
+
+    
+![png](output_256_0.png)
+    
+
+
+
+```python
+##################################
+# Separating the target 
+# and predictor columns
+##################################
+X = cancer_rate_premodelling.drop('CANRAT', axis = 1)
+y = cancer_rate_premodelling['CANRAT'].cat.codes
+```
+
+
+```python
+##################################
+# Formulating the train and test data
+# using a 70-30 ratio
+##################################
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state= 88888888, stratify=y)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the train dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_train.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (114, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the train dataset
+##################################
+y_train.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.745614
+    1    0.254386
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Initiating an oversampling instance
+# on the train data using
+# Condense Nearest Neighbors
+##################################
+cnn = CondensedNearestNeighbour(random_state = 88888888, n_neighbors=3)
+X_train_cnn, y_train_cnn = cnn.fit_resample(X_train,y_train)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the overampled train dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_train_cnn.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (50, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the overampled train dataset
+##################################
+y_train_cnn.value_counts(normalize = True)
+```
+
+
+
+
+    1    0.58
+    0    0.42
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Performing a general exploration of the test dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_test.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (49, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the test dataset
+##################################
+y_test.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.755102
+    1    0.244898
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Defining a function to compute
+# model performance
+##################################
+def model_performance_evaluation(y_true, y_pred):
+    metric_name = ['Accuracy','Precision','Recall','F1','AUROC']
+    metric_value = [accuracy_score(y_true, y_pred),
+                   precision_score(y_true, y_pred),
+                   recall_score(y_true, y_pred),
+                   f1_score(y_true, y_pred),
+                   roc_auc_score(y_true, y_pred)]    
+    metric_summary = pd.DataFrame(zip(metric_name, metric_value),
+                                  columns=['metric_name','metric_value']) 
+    return(metric_summary)
+```
+
 ### 1.9.2 Logistic Regression <a class="anchor" id="1.9.2"></a>
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Logistic Regression model
+##################################
+logistic_regression = LogisticRegression()
+
+##################################
+# Defining the hyperparameters for the
+# Logistic Regression model
+##################################
+hyperparameter_grid = {
+    'C': [1.0],
+    'penalty': ['l1', 'l2'],
+    'solver': ['liblinear','saga'],
+    'class_weight': [None],
+    'max_iter': [500],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Logistic Regression model
+##################################
+downsampled_logistic_regression = GridSearchCV(estimator = logistic_regression, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the downsampled Logistic Regression model
+##################################
+downsampled_logistic_regression.fit(X_train_cnn, y_train_cnn)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Logistic Regression model
+##################################
+downsampled_logistic_regression.best_score_ 
+downsampled_logistic_regression.best_params_
+```
+
+
+
+
+    {'C': 1.0,
+     'class_weight': None,
+     'max_iter': 500,
+     'penalty': 'l1',
+     'random_state': 88888888,
+     'solver': 'liblinear'}
+
+
+
+
+```python
+##################################
+# Evaluating the downsampled Logistic Regression model
+# on the train set
+##################################
+downsampled_logistic_regression_y_hat_train = downsampled_logistic_regression.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+downsampled_logistic_regression_performance_train = model_performance_evaluation(y_train, downsampled_logistic_regression_y_hat_train)
+downsampled_logistic_regression_performance_train['model'] = ['downsampled_logistic_regression'] * 5
+downsampled_logistic_regression_performance_train['set'] = ['train'] * 5
+print('Downsampled Logistic Regression Model Performance on Train Data: ')
+display(downsampled_logistic_regression_performance_train)
+```
+
+    Downsampled Logistic Regression Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.947368</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.848485</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.903226</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.953347</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the downsampled Logistic Regression model
+# on the test set
+##################################
+downsampled_logistic_regression_y_hat_test = downsampled_logistic_regression.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+downsampled_logistic_regression_performance_test = model_performance_evaluation(y_test, downsampled_logistic_regression_y_hat_test)
+downsampled_logistic_regression_performance_test['model'] = ['downsampled_logistic_regression'] * 5
+downsampled_logistic_regression_performance_test['set'] = ['test'] * 5
+print('Downsampled Logistic Regression Model Performance on Test Data: ')
+display(downsampled_logistic_regression_performance_test)
+```
+
+    Downsampled Logistic Regression Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.818182</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.861486</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ### 1.9.3 Decision Trees <a class="anchor" id="1.9.3"></a>
 
 [Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
 
+
+```python
+##################################
+# Creating an instance of the 
+# Decision Tree model
+##################################
+decision_tree = DecisionTreeClassifier()
+
+##################################
+# Defining the hyperparameters for the
+# Decision Tree model
+##################################
+hyperparameter_grid = {
+    'criterion': ['gini','entropy','log_loss'],
+    'max_depth': [3,5,7],
+    'min_samples_leaf': [3,5,10],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Decision Tree model
+##################################
+downsampled_decision_tree = GridSearchCV(estimator = decision_tree, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the downsampled Decision Tree model
+##################################
+downsampled_decision_tree.fit(X_train_cnn, y_train_cnn)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Decision Tree model
+##################################
+downsampled_decision_tree.best_score_ 
+downsampled_decision_tree.best_params_
+```
+
+
+
+
+    {'class_weight': None,
+     'criterion': 'gini',
+     'max_depth': 3,
+     'min_samples_leaf': 5,
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the downsampled Decision Tree model
+# on the train set
+##################################
+downsampled_decision_tree_y_hat_train = downsampled_decision_tree.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+downsampled_decision_tree_performance_train = model_performance_evaluation(y_train, downsampled_decision_tree_y_hat_train)
+downsampled_decision_tree_performance_train['model'] = ['downsampled_decision_tree'] * 5
+downsampled_decision_tree_performance_train['set'] = ['train'] * 5
+print('Downsampled Decision Tree Model Performance on Train Data: ')
+display(downsampled_decision_tree_performance_train)
+```
+
+    Downsampled Decision Tree Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.938596</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.923077</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.827586</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.872727</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.902028</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the downsampled Decision Tree model
+# on the test set
+##################################
+downsampled_decision_tree_y_hat_test = downsampled_decision_tree.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+downsampled_decision_tree_performance_test = model_performance_evaluation(y_test, downsampled_decision_tree_y_hat_test)
+downsampled_decision_tree_performance_test['model'] = ['downsampled_decision_tree'] * 5
+downsampled_decision_tree_performance_test['set'] = ['test'] * 5
+print('Downsampled Decision Tree Model Performance on Test Data: ')
+display(downsampled_decision_tree_performance_test)
+```
+
+    Downsampled Decision Tree Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 ### 1.9.4 Random Forest <a class="anchor" id="1.9.4"></a>
 
 [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Random Forest model
+##################################
+random_forest = RandomForestClassifier()
+
+##################################
+# Defining the hyperparameters for the
+# Random Forest model
+##################################
+hyperparameter_grid = {
+    'criterion': ['gini','entropy','log_loss'],
+    'max_depth': [3,5,7],
+    'min_samples_leaf': [3,5,10],
+    'n_estimators': [3,5,7],
+    'max_features':['sqrt', 'log2'],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Random Forest model
+##################################
+downsampled_random_forest = GridSearchCV(estimator = random_forest, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the downsampled Random Forest model
+##################################
+downsampled_random_forest.fit(X_train_cnn, y_train_cnn)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Random Forest model
+##################################
+downsampled_random_forest.best_score_ 
+downsampled_random_forest.best_params_
+```
+
+
+
+
+    {'class_weight': None,
+     'criterion': 'entropy',
+     'max_depth': 3,
+     'max_features': 'sqrt',
+     'min_samples_leaf': 3,
+     'n_estimators': 5,
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the downsampled Random Forest model
+# on the train set
+##################################
+downsampled_random_forest_y_hat_train = downsampled_random_forest.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+downsampled_random_forest_performance_train = model_performance_evaluation(y_train, downsampled_random_forest_y_hat_train)
+downsampled_random_forest_performance_train['model'] = ['downsampled_random_forest'] * 5
+downsampled_random_forest_performance_train['set'] = ['train'] * 5
+print('Downsampled Random Forest Model Performance on Train Data: ')
+display(downsampled_random_forest_performance_train)
+```
+
+    Downsampled Random Forest Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.947368</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.870968</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.931034</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.900000</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.941988</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the downsampled Random Forest model
+# on the test set
+##################################
+downsampled_random_forest_y_hat_test = downsampled_random_forest.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+downsampled_random_forest_performance_test = model_performance_evaluation(y_test, downsampled_random_forest_y_hat_test)
+downsampled_random_forest_performance_test['model'] = ['downsampled_random_forest'] * 5
+downsampled_random_forest_performance_test['set'] = ['test'] * 5
+print('Downsampled Random Forest Model Performance on Test Data: ')
+display(downsampled_random_forest_performance_test)
+```
+
+    Downsampled Random Forest Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ### 1.9.5 Support Vector Machine <a class="anchor" id="1.9.6"></a>
 
 [Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
 
-## 1.10. Model Development With Stacking Ensemble Learning <a class="anchor" id="1.9"></a>
+
+```python
+##################################
+# Creating an instance of the 
+# Support Vector Machine model
+##################################
+support_vector_machine = SVC()
+
+##################################
+# Defining the hyperparameters for the
+# Support Vector Machine model
+##################################
+hyperparameter_grid = {
+    'C': [1.0],
+    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Support Vector Machine model
+##################################
+downsampled_support_vector_machine = GridSearchCV(estimator = support_vector_machine, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the downsampled Support Vector Machine model
+##################################
+downsampled_support_vector_machine.fit(X_train_cnn, y_train_cnn)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Support Vector Machine model
+##################################
+downsampled_support_vector_machine.best_score_ 
+downsampled_support_vector_machine.best_params_
+```
+
+
+
+
+    {'C': 1.0, 'class_weight': None, 'kernel': 'linear', 'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the downsampled Support Vector Machine model
+# on the train set
+##################################
+downsampled_support_vector_machine_y_hat_train = downsampled_support_vector_machine.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+downsampled_support_vector_machine_performance_train = model_performance_evaluation(y_train, downsampled_support_vector_machine_y_hat_train)
+downsampled_support_vector_machine_performance_train['model'] = ['downsampled_support_vector_machine'] * 5
+downsampled_support_vector_machine_performance_train['set'] = ['train'] * 5
+print('Downsampled Support Vector Machine Model Performance on Train Data: ')
+display(downsampled_support_vector_machine_performance_train)
+```
+
+    Downsampled Support Vector Machine Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.956140</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.928571</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.896552</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.912281</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.936511</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the downsampled Support Vector Machine model
+# on the test set
+##################################
+downsampled_support_vector_machine_y_hat_test = downsampled_support_vector_machine.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+downsampled_support_vector_machine_performance_test = model_performance_evaluation(y_test, downsampled_support_vector_machine_y_hat_test)
+downsampled_support_vector_machine_performance_test['model'] = ['downsampled_support_vector_machine'] * 5
+downsampled_support_vector_machine_performance_test['set'] = ['test'] * 5
+print('Downsampled Support Vector Machine Model Performance on Test Data: ')
+display(downsampled_support_vector_machine_performance_test)
+```
+
+    Downsampled Support Vector Machine Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+## 1.10. Model Development With Stacking Ensemble Learning <a class="anchor" id="1.10"></a>
+
+[Model Stacking](https://www.manning.com/books/ensemble-methods-for-machine-learning) - also known as stacked generalization, is an ensemble approach which involves creating a variety of base learners and using them to create intermediate predictions, one for each learned model. A meta-model is incorporated that gains knowledge of the same target from intermediate predictions. Unlike bagging, in stacking, the models are typically different (e.g. not all decision trees) and fit on the same dataset (e.g. instead of samples of the training dataset). Unlike boosting, in stacking, a single model is used to learn how to best combine the predictions from the contributing models (e.g. instead of a sequence of models that correct the predictions of prior models). Stacking is appropriate when the predictions made by the base learners or the errors in predictions made by the models have minimal correlation. Achieving an improvement in performance is dependent upon the choice of base learners and whether they are sufficiently skillful in their predictions.
 
 ### 1.10.1 Premodelling Data Description <a class="anchor" id="1.10.1"></a>
+
+
+```python
+##################################
+# Consolidating all the
+# Logistic Regression
+# model performance measures
+##################################
+logistic_regression_performance_comparison = pd.concat([optimal_logistic_regression_performance_train, 
+                                                        optimal_logistic_regression_performance_test,
+                                                        weighted_logistic_regression_performance_train, 
+                                                        weighted_logistic_regression_performance_test,
+                                                        upsampled_logistic_regression_performance_train, 
+                                                        upsampled_logistic_regression_performance_test,
+                                                        downsampled_logistic_regression_performance_train, 
+                                                        downsampled_logistic_regression_performance_test], 
+                                                       ignore_index=True)
+print('Consolidated Logistic Regression Model Performance on Train and Test Data: ')
+display(logistic_regression_performance_comparison)
+```
+
+    Consolidated Logistic Regression Model Performance on Train and Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.947368</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.870968</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.931034</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.900000</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.941988</td>
+      <td>optimal_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>optimal_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Accuracy</td>
+      <td>0.894737</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Precision</td>
+      <td>0.707317</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>F1</td>
+      <td>0.828571</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>AUROC</td>
+      <td>0.929412</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Accuracy</td>
+      <td>0.938776</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Precision</td>
+      <td>0.846154</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Recall</td>
+      <td>0.916667</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>F1</td>
+      <td>0.880000</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>AUROC</td>
+      <td>0.931306</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Accuracy</td>
+      <td>0.964912</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Precision</td>
+      <td>0.903226</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>F1</td>
+      <td>0.933333</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>AUROC</td>
+      <td>0.965112</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>F1</td>
+      <td>0.818182</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>AUROC</td>
+      <td>0.861486</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>Accuracy</td>
+      <td>0.947368</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>Precision</td>
+      <td>0.848485</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>F1</td>
+      <td>0.903226</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>AUROC</td>
+      <td>0.953347</td>
+      <td>downsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>F1</td>
+      <td>0.818182</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>AUROC</td>
+      <td>0.861486</td>
+      <td>downsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Consolidating all the F1 score
+# model performance measures
+##################################
+logistic_regression_performance_comparison_F1 = logistic_regression_performance_comparison[logistic_regression_performance_comparison['metric_name']=='F1']
+logistic_regression_performance_comparison_F1_train = logistic_regression_performance_comparison_F1[logistic_regression_performance_comparison_F1['set']=='train'].loc[:,"metric_value"]
+logistic_regression_performance_comparison_F1_test = logistic_regression_performance_comparison_F1[logistic_regression_performance_comparison_F1['set']=='test'].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Combining all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+logistic_regression_performance_comparison_F1_plot = pd.DataFrame({'train': logistic_regression_performance_comparison_F1_train.values,
+                                                                   'test': logistic_regression_performance_comparison_F1_test.values},
+                                                                  index=logistic_regression_performance_comparison_F1['model'].unique())
+logistic_regression_performance_comparison_F1_plot
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>optimal_logistic_regression</th>
+      <td>0.900000</td>
+      <td>0.761905</td>
+    </tr>
+    <tr>
+      <th>weighted_logistic_regression</th>
+      <td>0.828571</td>
+      <td>0.880000</td>
+    </tr>
+    <tr>
+      <th>upsampled_logistic_regression</th>
+      <td>0.933333</td>
+      <td>0.818182</td>
+    </tr>
+    <tr>
+      <th>downsampled_logistic_regression</th>
+      <td>0.903226</td>
+      <td>0.818182</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+##################################
+# Plotting all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+logistic_regression_performance_comparison_F1_plot = logistic_regression_performance_comparison_F1_plot.plot.barh(figsize=(10, 6))
+logistic_regression_performance_comparison_F1_plot.set_xlim(0.00,1.00)
+logistic_regression_performance_comparison_F1_plot.set_title("Model Comparison by F1 Score Performance on Test Data")
+logistic_regression_performance_comparison_F1_plot.set_xlabel("F1 Score Performance")
+logistic_regression_performance_comparison_F1_plot.set_ylabel("Logistic Regression Model")
+logistic_regression_performance_comparison_F1_plot.grid(False)
+logistic_regression_performance_comparison_F1_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in logistic_regression_performance_comparison_F1_plot.containers:
+    logistic_regression_performance_comparison_F1_plot.bar_label(container, fmt='%.5f', padding=-50)
+```
+
+
+    
+![png](output_288_0.png)
+    
+
+
+
+```python
+##################################
+# Consolidating all the
+# Decision Tree
+# model performance measures
+##################################
+decision_tree_performance_comparison = pd.concat([optimal_decision_tree_performance_train, 
+                                                  optimal_decision_tree_performance_test,
+                                                  weighted_decision_tree_performance_train, 
+                                                  weighted_decision_tree_performance_test,
+                                                  upsampled_decision_tree_performance_train, 
+                                                  upsampled_decision_tree_performance_test,
+                                                  downsampled_decision_tree_performance_train, 
+                                                  downsampled_decision_tree_performance_test], 
+                                                 ignore_index=True)
+print('Consolidated Decision Tree Model Performance on Train and Test Data: ')
+display(decision_tree_performance_comparison)
+```
+
+    Consolidated Decision Tree Model Performance on Train and Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.973684</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>1.000000</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.896552</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.945455</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.948276</td>
+      <td>optimal_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Accuracy</td>
+      <td>0.857143</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Precision</td>
+      <td>0.857143</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Recall</td>
+      <td>0.500000</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>F1</td>
+      <td>0.631579</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>AUROC</td>
+      <td>0.736486</td>
+      <td>optimal_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Accuracy</td>
+      <td>0.956140</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Precision</td>
+      <td>0.852941</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>F1</td>
+      <td>0.920635</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>AUROC</td>
+      <td>0.970588</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Precision</td>
+      <td>0.769231</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Recall</td>
+      <td>0.833333</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>F1</td>
+      <td>0.800000</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>AUROC</td>
+      <td>0.876126</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Accuracy</td>
+      <td>0.921053</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Precision</td>
+      <td>0.763158</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>F1</td>
+      <td>0.865672</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>AUROC</td>
+      <td>0.947059</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>Precision</td>
+      <td>0.769231</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>Recall</td>
+      <td>0.833333</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>F1</td>
+      <td>0.800000</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>AUROC</td>
+      <td>0.876126</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>Accuracy</td>
+      <td>0.938596</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>Precision</td>
+      <td>0.923077</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>Recall</td>
+      <td>0.827586</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>F1</td>
+      <td>0.872727</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>AUROC</td>
+      <td>0.902028</td>
+      <td>downsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>downsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Consolidating all the F1 score
+# model performance measures
+##################################
+decision_tree_performance_comparison_F1 = decision_tree_performance_comparison[decision_tree_performance_comparison['metric_name']=='F1']
+decision_tree_performance_comparison_F1_train = decision_tree_performance_comparison_F1[decision_tree_performance_comparison_F1['set']=='train'].loc[:,"metric_value"]
+decision_tree_performance_comparison_F1_test = decision_tree_performance_comparison_F1[decision_tree_performance_comparison_F1['set']=='test'].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Combining all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+decision_tree_performance_comparison_F1_plot = pd.DataFrame({'train': decision_tree_performance_comparison_F1_train.values,
+                                                             'test': decision_tree_performance_comparison_F1_test.values},
+                                                            index=decision_tree_performance_comparison_F1['model'].unique())
+decision_tree_performance_comparison_F1_plot
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>optimal_decision_tree</th>
+      <td>0.945455</td>
+      <td>0.631579</td>
+    </tr>
+    <tr>
+      <th>weighted_decision_tree</th>
+      <td>0.920635</td>
+      <td>0.800000</td>
+    </tr>
+    <tr>
+      <th>upsampled_decision_tree</th>
+      <td>0.865672</td>
+      <td>0.800000</td>
+    </tr>
+    <tr>
+      <th>downsampled_decision_tree</th>
+      <td>0.872727</td>
+      <td>0.761905</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+##################################
+# Plotting all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+decision_tree_performance_comparison_F1_plot = decision_tree_performance_comparison_F1_plot.plot.barh(figsize=(10, 6))
+decision_tree_performance_comparison_F1_plot.set_xlim(0.00,1.00)
+decision_tree_performance_comparison_F1_plot.set_title("Model Comparison by F1 Score Performance on Test Data")
+decision_tree_performance_comparison_F1_plot.set_xlabel("F1 Score Performance")
+decision_tree_performance_comparison_F1_plot.set_ylabel("Decision Tree Model")
+decision_tree_performance_comparison_F1_plot.grid(False)
+decision_tree_performance_comparison_F1_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in decision_tree_performance_comparison_F1_plot.containers:
+    decision_tree_performance_comparison_F1_plot.bar_label(container, fmt='%.5f', padding=-50)
+```
+
+
+    
+![png](output_292_0.png)
+    
+
+
+
+```python
+##################################
+# Consolidating all the
+# Random Forest
+# model performance measures
+##################################
+random_forest_performance_comparison = pd.concat([optimal_random_forest_performance_train, 
+                                                  optimal_random_forest_performance_test,
+                                                  weighted_random_forest_performance_train, 
+                                                  weighted_random_forest_performance_test,
+                                                  upsampled_random_forest_performance_train, 
+                                                  upsampled_random_forest_performance_test,
+                                                  downsampled_random_forest_performance_train, 
+                                                  downsampled_random_forest_performance_test], 
+                                                 ignore_index=True)
+print('Consolidated Random Forest Model Performance on Train and Test Data: ')
+display(random_forest_performance_comparison)
+```
+
+    Consolidated Random Forest Model Performance on Train and Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.964912</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.931034</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.931034</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.931034</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.953753</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Accuracy</td>
+      <td>0.929825</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Precision</td>
+      <td>0.800000</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>F1</td>
+      <td>0.875000</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>AUROC</td>
+      <td>0.941582</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Accuracy</td>
+      <td>0.938776</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Precision</td>
+      <td>0.909091</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Recall</td>
+      <td>0.833333</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>F1</td>
+      <td>0.869565</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>AUROC</td>
+      <td>0.903153</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Accuracy</td>
+      <td>0.982456</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Precision</td>
+      <td>0.935484</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>F1</td>
+      <td>0.966667</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>AUROC</td>
+      <td>0.988235</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>F1</td>
+      <td>0.818182</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>AUROC</td>
+      <td>0.861486</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>Accuracy</td>
+      <td>0.947368</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>Precision</td>
+      <td>0.870968</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>Recall</td>
+      <td>0.931034</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>F1</td>
+      <td>0.900000</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>AUROC</td>
+      <td>0.941988</td>
+      <td>downsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>downsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Consolidating all the F1 score
+# model performance measures
+##################################
+random_forest_performance_comparison_F1 = random_forest_performance_comparison[random_forest_performance_comparison['metric_name']=='F1']
+random_forest_performance_comparison_F1_train = random_forest_performance_comparison_F1[random_forest_performance_comparison_F1['set']=='train'].loc[:,"metric_value"]
+random_forest_performance_comparison_F1_test = random_forest_performance_comparison_F1[random_forest_performance_comparison_F1['set']=='test'].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Combining all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+random_forest_performance_comparison_F1_plot = pd.DataFrame({'train': random_forest_performance_comparison_F1_train.values,
+                                                             'test': random_forest_performance_comparison_F1_test.values},
+                                                            index=random_forest_performance_comparison_F1['model'].unique())
+random_forest_performance_comparison_F1_plot
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>optimal_random_forest</th>
+      <td>0.931034</td>
+      <td>0.761905</td>
+    </tr>
+    <tr>
+      <th>weighted_random_forest</th>
+      <td>0.875000</td>
+      <td>0.869565</td>
+    </tr>
+    <tr>
+      <th>upsampled_random_forest</th>
+      <td>0.966667</td>
+      <td>0.818182</td>
+    </tr>
+    <tr>
+      <th>downsampled_random_forest</th>
+      <td>0.900000</td>
+      <td>0.761905</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+##################################
+# Plotting all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+random_forest_performance_comparison_F1_plot = random_forest_performance_comparison_F1_plot.plot.barh(figsize=(10, 6))
+random_forest_performance_comparison_F1_plot.set_xlim(0.00,1.00)
+random_forest_performance_comparison_F1_plot.set_title("Model Comparison by F1 Score Performance on Test Data")
+random_forest_performance_comparison_F1_plot.set_xlabel("F1 Score Performance")
+random_forest_performance_comparison_F1_plot.set_ylabel("Random Forest Model")
+random_forest_performance_comparison_F1_plot.grid(False)
+random_forest_performance_comparison_F1_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in random_forest_performance_comparison_F1_plot.containers:
+    random_forest_performance_comparison_F1_plot.bar_label(container, fmt='%.5f', padding=-50)
+```
+
+
+    
+![png](output_296_0.png)
+    
+
+
+
+```python
+##################################
+# Consolidating all the
+# Support Vector Machine
+# model performance measures
+##################################
+support_vector_machine_performance_comparison = pd.concat([optimal_support_vector_machine_performance_train, 
+                                                  optimal_support_vector_machine_performance_test,
+                                                  weighted_support_vector_machine_performance_train, 
+                                                  weighted_support_vector_machine_performance_test,
+                                                  upsampled_support_vector_machine_performance_train, 
+                                                  upsampled_support_vector_machine_performance_test,
+                                                  downsampled_support_vector_machine_performance_train, 
+                                                  downsampled_support_vector_machine_performance_test], 
+                                                 ignore_index=True)
+print('Consolidated Support Vector Machine Model Performance on Train and Test Data: ')
+display(support_vector_machine_performance_comparison)
+```
+
+    Consolidated Support Vector Machine Model Performance on Train and Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.947368</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.960000</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.827586</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.888889</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.907911</td>
+      <td>optimal_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Accuracy</td>
+      <td>0.857143</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Precision</td>
+      <td>0.857143</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Recall</td>
+      <td>0.500000</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>F1</td>
+      <td>0.631579</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>AUROC</td>
+      <td>0.736486</td>
+      <td>optimal_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Accuracy</td>
+      <td>0.964912</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Precision</td>
+      <td>0.962963</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Recall</td>
+      <td>0.896552</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>F1</td>
+      <td>0.928571</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>AUROC</td>
+      <td>0.942394</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Accuracy</td>
+      <td>0.877551</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Precision</td>
+      <td>0.875000</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Recall</td>
+      <td>0.583333</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>F1</td>
+      <td>0.700000</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>AUROC</td>
+      <td>0.778153</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Accuracy</td>
+      <td>0.973684</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Precision</td>
+      <td>0.906250</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>F1</td>
+      <td>0.950820</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>AUROC</td>
+      <td>0.982353</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>Precision</td>
+      <td>0.818182</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>F1</td>
+      <td>0.782609</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>AUROC</td>
+      <td>0.847973</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>Accuracy</td>
+      <td>0.956140</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>Precision</td>
+      <td>0.928571</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>Recall</td>
+      <td>0.896552</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>F1</td>
+      <td>0.912281</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>AUROC</td>
+      <td>0.936511</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>downsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Consolidating all the F1 score
+# model performance measures
+##################################
+support_vector_machine_performance_comparison_F1 = support_vector_machine_performance_comparison[support_vector_machine_performance_comparison['metric_name']=='F1']
+support_vector_machine_performance_comparison_F1_train = support_vector_machine_performance_comparison_F1[support_vector_machine_performance_comparison_F1['set']=='train'].loc[:,"metric_value"]
+support_vector_machine_performance_comparison_F1_test = support_vector_machine_performance_comparison_F1[support_vector_machine_performance_comparison_F1['set']=='test'].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Combining all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+support_vector_machine_performance_comparison_F1_plot = pd.DataFrame({'train': support_vector_machine_performance_comparison_F1_train.values,
+                                                                      'test': support_vector_machine_performance_comparison_F1_test.values},
+                                                                     index=support_vector_machine_performance_comparison_F1['model'].unique())
+support_vector_machine_performance_comparison_F1_plot
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>optimal_support_vector_machine</th>
+      <td>0.888889</td>
+      <td>0.631579</td>
+    </tr>
+    <tr>
+      <th>weighted_support_vector_machine</th>
+      <td>0.928571</td>
+      <td>0.700000</td>
+    </tr>
+    <tr>
+      <th>upsampled_support_vector_machine</th>
+      <td>0.950820</td>
+      <td>0.782609</td>
+    </tr>
+    <tr>
+      <th>downsampled_support_vector_machine</th>
+      <td>0.912281</td>
+      <td>0.761905</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+##################################
+# Plotting all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+support_vector_machine_performance_comparison_F1_plot = support_vector_machine_performance_comparison_F1_plot.plot.barh(figsize=(10, 6))
+support_vector_machine_performance_comparison_F1_plot.set_xlim(0.00,1.00)
+support_vector_machine_performance_comparison_F1_plot.set_title("Model Comparison by F1 Score Performance on Test Data")
+support_vector_machine_performance_comparison_F1_plot.set_xlabel("F1 Score Performance")
+support_vector_machine_performance_comparison_F1_plot.set_ylabel("Support Vector Machine Model")
+support_vector_machine_performance_comparison_F1_plot.grid(False)
+support_vector_machine_performance_comparison_F1_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in support_vector_machine_performance_comparison_F1_plot.containers:
+    support_vector_machine_performance_comparison_F1_plot.bar_label(container, fmt='%.5f', padding=-50)
+```
+
+
+    
+![png](output_300_0.png)
+    
+
 
 ### 1.10.2 Logistic Regression <a class="anchor" id="1.10.2"></a>
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+
+```python
+##################################
+# Formulating the base learners
+# using the optimal hyperparameters
+# for the weighted models
+##################################
+base_learners = [('LR', LogisticRegression(C=1.0,
+                                          class_weight={0: 0.25, 1: 0.75},
+                                          max_iter=500,
+                                          penalty='l2',
+                                          random_state=88888888,
+                                          solver='liblinear')),
+                ('DT', DecisionTreeClassifier(class_weight={0: 0.25, 1: 0.75},
+                                              criterion='gini',
+                                              max_depth=3,
+                                              min_samples_leaf=3,
+                                              random_state=88888888)),
+                ('RF', RandomForestClassifier(class_weight={0: 0.25, 1: 0.75},
+                                              criterion='entropy',
+                                              max_depth=3,
+                                              max_features='sqrt',
+                                              min_samples_leaf=5,
+                                              n_estimators=3,
+                                              random_state=88888888)),
+               ('SVM', SVC(class_weight={0: 0.25, 1: 0.75},
+                           C=1.0,
+                           kernel='poly',
+                           random_state=88888888))]
+```
+
+
+```python
+##################################
+# Formulating the meta learner
+# using default hyperparameters
+# but with class weights
+##################################
+meta_learner = LogisticRegression(C=1.0,
+                                  class_weight={0: 0.25, 1: 0.75},
+                                  max_iter=500,
+                                  random_state=88888888)
+```
+
+
+```python
+##################################
+# Formulating the stacked model
+# using the base and meta learners
+##################################
+stacked_logistic_regression = StackingClassifier(estimators=base_learners, final_estimator=meta_learner)
+```
+
+
+```python
+##################################
+# Fitting the weighted Logistic Regression model
+##################################
+stacked_logistic_regression.fit(X_train, y_train)
+```
+
+
+
+
+<style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>StackingClassifier(estimators=[(&#x27;LR&#x27;,
+                                LogisticRegression(class_weight={0: 0.25,
+                                                                 1: 0.75},
+                                                   max_iter=500,
+                                                   random_state=88888888,
+                                                   solver=&#x27;liblinear&#x27;)),
+                               (&#x27;DT&#x27;,
+                                DecisionTreeClassifier(class_weight={0: 0.25,
+                                                                     1: 0.75},
+                                                       max_depth=3,
+                                                       min_samples_leaf=3,
+                                                       random_state=88888888)),
+                               (&#x27;RF&#x27;,
+                                RandomForestClassifier(class_weight={0: 0.25,
+                                                                     1: 0.75},
+                                                       criterion=&#x27;entropy&#x27;,
+                                                       max_depth=3,
+                                                       min_samples_leaf=5,
+                                                       n_estimators=3,
+                                                       random_state=88888888)),
+                               (&#x27;SVM&#x27;,
+                                SVC(class_weight={0: 0.25, 1: 0.75},
+                                    kernel=&#x27;poly&#x27;, random_state=88888888))],
+                   final_estimator=LogisticRegression(class_weight={0: 0.25,
+                                                                    1: 0.75},
+                                                      max_iter=500,
+                                                      random_state=88888888))</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" ><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">StackingClassifier</label><div class="sk-toggleable__content"><pre>StackingClassifier(estimators=[(&#x27;LR&#x27;,
+                                LogisticRegression(class_weight={0: 0.25,
+                                                                 1: 0.75},
+                                                   max_iter=500,
+                                                   random_state=88888888,
+                                                   solver=&#x27;liblinear&#x27;)),
+                               (&#x27;DT&#x27;,
+                                DecisionTreeClassifier(class_weight={0: 0.25,
+                                                                     1: 0.75},
+                                                       max_depth=3,
+                                                       min_samples_leaf=3,
+                                                       random_state=88888888)),
+                               (&#x27;RF&#x27;,
+                                RandomForestClassifier(class_weight={0: 0.25,
+                                                                     1: 0.75},
+                                                       criterion=&#x27;entropy&#x27;,
+                                                       max_depth=3,
+                                                       min_samples_leaf=5,
+                                                       n_estimators=3,
+                                                       random_state=88888888)),
+                               (&#x27;SVM&#x27;,
+                                SVC(class_weight={0: 0.25, 1: 0.75},
+                                    kernel=&#x27;poly&#x27;, random_state=88888888))],
+                   final_estimator=LogisticRegression(class_weight={0: 0.25,
+                                                                    1: 0.75},
+                                                      max_iter=500,
+                                                      random_state=88888888))</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>LR</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(class_weight={0: 0.25, 1: 0.75}, max_iter=500,
+                   random_state=88888888, solver=&#x27;liblinear&#x27;)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>DT</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">DecisionTreeClassifier</label><div class="sk-toggleable__content"><pre>DecisionTreeClassifier(class_weight={0: 0.25, 1: 0.75}, max_depth=3,
+                       min_samples_leaf=3, random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>RF</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestClassifier</label><div class="sk-toggleable__content"><pre>RandomForestClassifier(class_weight={0: 0.25, 1: 0.75}, criterion=&#x27;entropy&#x27;,
+                       max_depth=3, min_samples_leaf=5, n_estimators=3,
+                       random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>SVM</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label sk-toggleable__label-arrow">SVC</label><div class="sk-toggleable__content"><pre>SVC(class_weight={0: 0.25, 1: 0.75}, kernel=&#x27;poly&#x27;, random_state=88888888)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>final_estimator</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox" ><label for="sk-estimator-id-6" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(class_weight={0: 0.25, 1: 0.75}, max_iter=500,
+                   random_state=88888888)</pre></div></div></div></div></div></div></div></div></div></div></div></div>
+
+
+
+
+```python
+##################################
+# Evaluating the stacked Logistic Regression model
+# on the train set
+##################################
+stacked_logistic_regression_y_hat_train = stacked_logistic_regression.predict(X_train)
+```
+
+
+```python
+##################################
+# Gathering the model evaluation metrics
+##################################
+stacked_logistic_regression_performance_train = model_performance_evaluation(y_train, stacked_logistic_regression_y_hat_train)
+stacked_logistic_regression_performance_train['model'] = ['stacked_logistic_regression'] * 5
+stacked_logistic_regression_performance_train['set'] = ['train'] * 5
+print('Stacked Logistic Regression Model Performance on Train Data: ')
+display(stacked_logistic_regression_performance_train)
+```
+
+    Stacked Logistic Regression Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.973684</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.933333</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.949153</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.970994</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the stacked Logistic Regression model
+# on the test set
+##################################
+stacked_logistic_regression_y_hat_test = stacked_logistic_regression.predict(X_test)
+```
+
+
+```python
+##################################
+# Gathering the model evaluation metrics
+##################################
+stacked_logistic_regression_performance_test = model_performance_evaluation(y_test, stacked_logistic_regression_y_hat_test)
+stacked_logistic_regression_performance_test['model'] = ['stacked_logistic_regression'] * 5
+stacked_logistic_regression_performance_test['set'] = ['test'] * 5
+print('Stacked Logistic Regression Model Performance on Test Data: ')
+display(stacked_logistic_regression_performance_test)
+```
+
+    Stacked Logistic Regression Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.818182</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.861486</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+## 1.11. Consolidated Findings <a class="anchor" id="1.11"></a>
+
+
+```python
+##################################
+# Consolidating all the
+# base and meta-learner
+# model performance measures
+##################################
+base_meta_learner_performance_comparison = pd.concat([weighted_logistic_regression_performance_train, 
+                                                      weighted_logistic_regression_performance_test,
+                                                      weighted_decision_tree_performance_train, 
+                                                      weighted_decision_tree_performance_test,
+                                                      weighted_random_forest_performance_train, 
+                                                      weighted_random_forest_performance_test,
+                                                      weighted_support_vector_machine_performance_train, 
+                                                      weighted_support_vector_machine_performance_test,
+                                                      stacked_logistic_regression_performance_train, 
+                                                      stacked_logistic_regression_performance_test], 
+                                                     ignore_index=True)
+print('Consolidated Base and Meta Learner Model Performance on Train and Test Data: ')
+display(base_meta_learner_performance_comparison)
+```
+
+    Consolidated Base and Meta Learner Model Performance on Train and Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.894737</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.707317</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.828571</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.929412</td>
+      <td>weighted_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Accuracy</td>
+      <td>0.938776</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Precision</td>
+      <td>0.846154</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Recall</td>
+      <td>0.916667</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>F1</td>
+      <td>0.880000</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>AUROC</td>
+      <td>0.931306</td>
+      <td>weighted_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>Accuracy</td>
+      <td>0.956140</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>Precision</td>
+      <td>0.852941</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>F1</td>
+      <td>0.920635</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>AUROC</td>
+      <td>0.970588</td>
+      <td>weighted_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>Precision</td>
+      <td>0.769231</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>Recall</td>
+      <td>0.833333</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>F1</td>
+      <td>0.800000</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>AUROC</td>
+      <td>0.876126</td>
+      <td>weighted_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>Accuracy</td>
+      <td>0.929825</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>Precision</td>
+      <td>0.800000</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>F1</td>
+      <td>0.875000</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>AUROC</td>
+      <td>0.941582</td>
+      <td>weighted_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>Accuracy</td>
+      <td>0.938776</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>Precision</td>
+      <td>0.909091</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>Recall</td>
+      <td>0.833333</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>F1</td>
+      <td>0.869565</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>AUROC</td>
+      <td>0.903153</td>
+      <td>weighted_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>Accuracy</td>
+      <td>0.964912</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>Precision</td>
+      <td>0.962963</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>32</th>
+      <td>Recall</td>
+      <td>0.896552</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>F1</td>
+      <td>0.928571</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>34</th>
+      <td>AUROC</td>
+      <td>0.942394</td>
+      <td>weighted_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>35</th>
+      <td>Accuracy</td>
+      <td>0.877551</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>Precision</td>
+      <td>0.875000</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>Recall</td>
+      <td>0.583333</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>F1</td>
+      <td>0.700000</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>AUROC</td>
+      <td>0.778153</td>
+      <td>weighted_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>Accuracy</td>
+      <td>0.973684</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>Precision</td>
+      <td>0.933333</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>42</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>43</th>
+      <td>F1</td>
+      <td>0.949153</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>44</th>
+      <td>AUROC</td>
+      <td>0.970994</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>45</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>47</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>F1</td>
+      <td>0.818182</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>49</th>
+      <td>AUROC</td>
+      <td>0.861486</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Consolidating all the F1 score
+# model performance measures
+##################################
+base_meta_learner_performance_comparison_F1 = base_meta_learner_performance_comparison[base_meta_learner_performance_comparison['metric_name']=='F1']
+base_meta_learner_performance_comparison_F1_train = base_meta_learner_performance_comparison_F1[base_meta_learner_performance_comparison_F1['set']=='train'].loc[:,"metric_value"]
+base_meta_learner_performance_comparison_F1_test = base_meta_learner_performance_comparison_F1[base_meta_learner_performance_comparison_F1['set']=='test'].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Combining all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+base_meta_learner_performance_comparison_F1_plot = pd.DataFrame({'train': base_meta_learner_performance_comparison_F1_train.values,
+                                                                 'test': base_meta_learner_performance_comparison_F1_test.values},
+                                                                index=base_meta_learner_performance_comparison_F1['model'].unique())
+base_meta_learner_performance_comparison_F1_plot
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>weighted_logistic_regression</th>
+      <td>0.828571</td>
+      <td>0.880000</td>
+    </tr>
+    <tr>
+      <th>weighted_decision_tree</th>
+      <td>0.920635</td>
+      <td>0.800000</td>
+    </tr>
+    <tr>
+      <th>weighted_random_forest</th>
+      <td>0.875000</td>
+      <td>0.869565</td>
+    </tr>
+    <tr>
+      <th>weighted_support_vector_machine</th>
+      <td>0.928571</td>
+      <td>0.700000</td>
+    </tr>
+    <tr>
+      <th>stacked_logistic_regression</th>
+      <td>0.949153</td>
+      <td>0.818182</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+##################################
+# Plotting all the F1 score
+# model performance measures
+# between train and test sets
+##################################
+base_meta_learner_performance_comparison_F1_plot = base_meta_learner_performance_comparison_F1_plot.plot.barh(figsize=(10, 6))
+base_meta_learner_performance_comparison_F1_plot.set_xlim(0.00,1.00)
+base_meta_learner_performance_comparison_F1_plot.set_title("Model Comparison by F1 Score Performance on Test Data")
+base_meta_learner_performance_comparison_F1_plot.set_xlabel("F1 Score Performance")
+base_meta_learner_performance_comparison_F1_plot.set_ylabel("Base and Meta Learner Model")
+base_meta_learner_performance_comparison_F1_plot.grid(False)
+base_meta_learner_performance_comparison_F1_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in base_meta_learner_performance_comparison_F1_plot.containers:
+    base_meta_learner_performance_comparison_F1_plot.bar_label(container, fmt='%.5f', padding=-50)
+```
+
+
+    
+![png](output_314_0.png)
+    
+
+
+
+```python
+##################################
+# Consolidating all score
+# model performance measures
+##################################
+base_meta_learner_performance_comparison_Accuracy_test = base_meta_learner_performance_comparison[(base_meta_learner_performance_comparison['set']=='test') & (base_meta_learner_performance_comparison['metric_name']=='Accuracy')].loc[:,"metric_value"]
+base_meta_learner_performance_comparison_Precision_test = base_meta_learner_performance_comparison[(base_meta_learner_performance_comparison['set']=='test') & (base_meta_learner_performance_comparison['metric_name']=='Precision')].loc[:,"metric_value"]
+base_meta_learner_performance_comparison_Recall_test = base_meta_learner_performance_comparison[(base_meta_learner_performance_comparison['set']=='test') & (base_meta_learner_performance_comparison['metric_name']=='Recall')].loc[:,"metric_value"]
+base_meta_learner_performance_comparison_F1_test = base_meta_learner_performance_comparison[(base_meta_learner_performance_comparison['set']=='test') & (base_meta_learner_performance_comparison['metric_name']=='F1')].loc[:,"metric_value"]
+base_meta_learner_performance_comparison_AUROC_test = base_meta_learner_performance_comparison[(base_meta_learner_performance_comparison['set']=='test') & (base_meta_learner_performance_comparison['metric_name']=='AUROC')].loc[:,"metric_value"]
+```
+
+
+```python
+##################################
+# Combining all the score
+# model performance measures
+# between train and test sets
+##################################
+base_meta_learner_performance_comparison_all_plot = pd.DataFrame({'accuracy': base_meta_learner_performance_comparison_Accuracy_test.values,
+                                                                  'precision': base_meta_learner_performance_comparison_Precision_test.values,
+                                                                  'recall': base_meta_learner_performance_comparison_Recall_test.values,
+                                                                  'f1': base_meta_learner_performance_comparison_F1_test.values,
+                                                                  'auroc': base_meta_learner_performance_comparison_AUROC_test.values},
+                                                                index=base_meta_learner_performance_comparison['model'].unique())
+base_meta_learner_performance_comparison_all_plot
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>accuracy</th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>f1</th>
+      <th>auroc</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>weighted_logistic_regression</th>
+      <td>0.938776</td>
+      <td>0.846154</td>
+      <td>0.916667</td>
+      <td>0.880000</td>
+      <td>0.931306</td>
+    </tr>
+    <tr>
+      <th>weighted_decision_tree</th>
+      <td>0.897959</td>
+      <td>0.769231</td>
+      <td>0.833333</td>
+      <td>0.800000</td>
+      <td>0.876126</td>
+    </tr>
+    <tr>
+      <th>weighted_random_forest</th>
+      <td>0.938776</td>
+      <td>0.909091</td>
+      <td>0.833333</td>
+      <td>0.869565</td>
+      <td>0.903153</td>
+    </tr>
+    <tr>
+      <th>weighted_support_vector_machine</th>
+      <td>0.877551</td>
+      <td>0.875000</td>
+      <td>0.583333</td>
+      <td>0.700000</td>
+      <td>0.778153</td>
+    </tr>
+    <tr>
+      <th>stacked_logistic_regression</th>
+      <td>0.918367</td>
+      <td>0.900000</td>
+      <td>0.750000</td>
+      <td>0.818182</td>
+      <td>0.861486</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+##################################
+# Plotting all the score
+# model performance measures
+# between train and test sets
+##################################
+base_meta_learner_performance_comparison_all_plot = base_meta_learner_performance_comparison_all_plot.plot.barh(figsize=(10, 6),width=0.90)
+base_meta_learner_performance_comparison_all_plot.set_xlim(0.00,1.00)
+base_meta_learner_performance_comparison_all_plot.set_title("Model Comparison by Score Performance on Test Data")
+base_meta_learner_performance_comparison_all_plot.set_xlabel("Score Performance")
+base_meta_learner_performance_comparison_all_plot.set_ylabel("Base and Meta Learner Model")
+base_meta_learner_performance_comparison_all_plot.grid(False)
+base_meta_learner_performance_comparison_all_plot.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+for container in base_meta_learner_performance_comparison_all_plot.containers:
+    base_meta_learner_performance_comparison_all_plot.bar_label(container, fmt='%.5f', padding=-50)
+```
+
+
+    
+![png](output_317_0.png)
+    
+
 
 # 2. Summary <a class="anchor" id="Summary"></a>
 
@@ -8697,6 +12499,7 @@ display(upsampled_support_vector_machine_performance_test)
 * **[Book]** [Data Cleaning](https://dl.acm.org/doi/book/10.1145/3310205) by Ihab Ilyas and Xu Chu
 * **[Book]** [Data Wrangling with Python](https://www.oreilly.com/library/view/data-wrangling-with/9781491948804/) by Jacqueline Kazil and Katharine Jarmul
 * **[Book]** [Regression Modeling Strategies](https://link.springer.com/book/10.1007/978-1-4757-3462-1) by Frank Harrell
+* **[Book]** [Ensemble Methods for Machine Learning](https://www.manning.com/books/ensemble-methods-for-machine-learning) by Gautam Kunapuli
 * **[Python Library API]** [NumPy](https://numpy.org/doc/) by NumPy Team
 * **[Python Library API]** [pandas](https://pandas.pydata.org/docs/) by Pandas Team
 * **[Python Library API]** [seaborn](https://seaborn.pydata.org/) by Seaborn Team

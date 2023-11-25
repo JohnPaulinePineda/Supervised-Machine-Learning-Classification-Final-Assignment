@@ -60,8 +60,6 @@
 
 # 1. Table of Contents <a class="anchor" id="TOC"></a>
 
-This project explores the various methods in assessing **Data Quality**, implementing **Data Preprocessing** and conducting **Data Exploration** for prediction problems with categorical responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. A non-exhaustive list of methods to detect missing data, extreme outlying points, near-zero variance, multicollinearity, and skewed distributions were evaluated. Remedial procedures on addressing data quality issues including missing data imputation, centering and scaling transformation, shape transformation and outlier treatment were similarly considered, as applicable. 
-
 This project implements different predictive modelling procedures for dichotomous categorical responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. Models applied in the analysis to predict dichotomous categorical responses included the **Logistic Regression**, **Decision Trees**, **Random Forest**, **Naive Bayes** and **Support Vector Machine** algorithms. Remedial procedures on addressing class imbalance including **Class Weighting**, **Synthetic Minority Oversampling Technique** and **Condensed Nearest Neighbors** were similarly considered, as applicable. Ensemble learning using **Stacking** which consolidate many different models types on the same data and using another model to learn how to best combine the predictions was also explored. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document.
 
 [Binary classification learning](https://link.springer.com/book/10.1007/978-1-4614-6849-3?page=1) refers to a predictive modelling problem where only two class labels are predicted for a given sample of input data. These models use the training data set and calculate how to best map instances of input data to the specific class labels. Typically, binary classification tasks involve one class that is the normal state (assigned the class label 0) and another class that is the abnormal state (assigned the class label 1). It is common to structure a binary classification task with a model that predicts a Bernoulli probability distribution for each instance. The Bernoulli distribution is a discrete probability distribution that covers a case where an event will have a binary outcome as either a 0 or 1. For a binary classification, this means that the model predicts a probability of an instance belonging to class 1, or the abnormal state. The algorithms applied in this study attempt to categorize the input data and form dichotomous groups based on their similarities.
@@ -165,6 +163,7 @@ from scipy import stats
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 ```
@@ -5787,11 +5786,11 @@ optimal_decision_tree_y_hat_train = optimal_decision_tree.predict(X_train)
 optimal_decision_tree_performance_train = model_performance_evaluation(y_train, optimal_decision_tree_y_hat_train)
 optimal_decision_tree_performance_train['model'] = ['optimal_decision_tree'] * 5
 optimal_decision_tree_performance_train['set'] = ['train'] * 5
-print('Optimal Logistic Regression Model Performance on Train Data: ')
+print('Optimal Decision Tree Model Performance on Train Data: ')
 display(optimal_decision_tree_performance_train)
 ```
 
-    Optimal Logistic Regression Model Performance on Train Data: 
+    Optimal Decision Tree Model Performance on Train Data: 
     
 
 
@@ -5874,11 +5873,11 @@ optimal_decision_tree_y_hat_test = optimal_decision_tree.predict(X_test)
 optimal_decision_tree_performance_test = model_performance_evaluation(y_test, optimal_decision_tree_y_hat_test)
 optimal_decision_tree_performance_test['model'] = ['optimal_decision_tree'] * 5
 optimal_decision_tree_performance_test['set'] = ['test'] * 5
-print('Optimal Logistic Regression Model Performance on Test Data: ')
+print('Optimal Decision Tree Model Performance on Test Data: ')
 display(optimal_decision_tree_performance_test)
 ```
 
-    Optimal Logistic Regression Model Performance on Test Data: 
+    Optimal Decision Tree Model Performance on Test Data: 
     
 
 
@@ -5948,6 +5947,238 @@ display(optimal_decision_tree_performance_test)
 
 
 ### 1.6.4 Random Forest <a class="anchor" id="1.6.4"></a>
+
+[Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Random Forest model
+##################################
+random_forest = RandomForestClassifier()
+
+##################################
+# Defining the hyperparameters for the
+# Random Forest model
+##################################
+hyperparameter_grid = {
+    'criterion': ['gini','entropy','log_loss'],
+    'max_depth': [3,5,7],
+    'min_samples_leaf': [3,5,10],
+    'n_estimators': [3,5,7],
+    'max_features':['sqrt', 'log2'],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Random Forest model
+##################################
+optimal_random_forest = GridSearchCV(estimator = random_forest, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the optimal Random Forest model
+##################################
+optimal_random_forest.fit(X_train, y_train)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Random Forest model
+##################################
+optimal_random_forest.best_score_ 
+optimal_random_forest.best_params_
+```
+
+
+
+
+    {'class_weight': None,
+     'criterion': 'gini',
+     'max_depth': 5,
+     'max_features': 'log2',
+     'min_samples_leaf': 3,
+     'n_estimators': 7,
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the optimal Random Forest model
+# on the train set
+##################################
+optimal_random_forest_y_hat_train = optimal_random_forest.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+optimal_random_forest_performance_train = model_performance_evaluation(y_train, optimal_random_forest_y_hat_train)
+optimal_random_forest_performance_train['model'] = ['optimal_random_forest'] * 5
+optimal_random_forest_performance_train['set'] = ['train'] * 5
+print('Optimal Random Forest Model Performance on Train Data: ')
+display(optimal_random_forest_performance_train)
+```
+
+    Optimal Random Forest Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.964912</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.931034</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.931034</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.931034</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.953753</td>
+      <td>optimal_random_forest</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the optimal Random Forest model
+# on the test set
+##################################
+optimal_random_forest_y_hat_test = optimal_random_forest.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+optimal_random_forest_performance_test = model_performance_evaluation(y_test, optimal_random_forest_y_hat_test)
+optimal_random_forest_performance_test['model'] = ['optimal_random_forest'] * 5
+optimal_random_forest_performance_test['set'] = ['test'] * 5
+print('Optimal Random Forest Model Performance on Test Data: ')
+display(optimal_random_forest_performance_test)
+```
+
+    Optimal Random Forest Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.888889</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.666667</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.761905</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.819820</td>
+      <td>optimal_random_forest</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ### 1.6.5 Naive Bayes <a class="anchor" id="1.6.5"></a>
 
@@ -6069,6 +6300,7 @@ display(optimal_decision_tree_performance_test)
 * **[Publication]** [A New Family of Power Transformations to Improve Normality or Symmetry](https://academic.oup.com/biomet/article-abstract/87/4/954/232908?redirectedFrom=fulltext&login=false) by In-Kwon Yeo and Richard Johnson (Biometrika)
 * **[Publication]** [The Origins of Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) by JS Cramer (Econometrics eJournal)
 * **[Publication]** [Classification and Regression Trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) by Leo Breiman, Jerome Friedman, Richard Olshen and Charles Stone (Computer Science)
+* **[Publication]** [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) by Leo Breiman (Machine Learning)
 
 ***
 

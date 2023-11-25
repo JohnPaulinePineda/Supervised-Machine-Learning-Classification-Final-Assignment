@@ -56,7 +56,7 @@
 
 # 1. Table of Contents <a class="anchor" id="TOC"></a>
 
-This project implements different predictive modelling procedures for dichotomous categorical responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. Models applied in the analysis to predict dichotomous categorical responses included the **Logistic Regression**, **Decision Trees**, **Random Forest**, **Naive Bayes** and **Support Vector Machine** algorithms. Remedial procedures on addressing class imbalance including **Class Weighting**, **Synthetic Minority Oversampling Technique** and **Condensed Nearest Neighbors** were similarly considered, as applicable. Ensemble learning using **Stacking** which consolidate many different models types on the same data and using another model to learn how to best combine the predictions was also explored. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document.
+This project implements different predictive modelling procedures for dichotomous categorical responses using various helpful packages in <mark style="background-color: #CCECFF"><b>Python</b></mark>. Models applied in the analysis to predict dichotomous categorical responses included the **Logistic Regression**, **Decision Trees**, **Random Forest** and **Support Vector Machine** algorithms. Remedial procedures on addressing class imbalance including **Class Weighting**, **Synthetic Minority Oversampling Technique** and **Condensed Nearest Neighbors** were similarly considered, as applicable. Ensemble learning using **Stacking** which consolidate many different models types on the same data and using another model to learn how to best combine the predictions was also explored. All results were consolidated in a [<span style="color: #FF0000"><b>Summary</b></span>](#Summary) presented at the end of the document.
 
 [Binary classification learning](https://link.springer.com/book/10.1007/978-1-4614-6849-3?page=1) refers to a predictive modelling problem where only two class labels are predicted for a given sample of input data. These models use the training data set and calculate how to best map instances of input data to the specific class labels. Typically, binary classification tasks involve one class that is the normal state (assigned the class label 0) and another class that is the abnormal state (assigned the class label 1). It is common to structure a binary classification task with a model that predicts a Bernoulli probability distribution for each instance. The Bernoulli distribution is a discrete probability distribution that covers a case where an event will have a binary outcome as either a 0 or 1. For a binary classification, this means that the model predicts a probability of an instance belonging to class 1, or the abnormal state. The algorithms applied in this study attempt to categorize the input data and form dichotomous groups based on their similarities.
 
@@ -140,6 +140,18 @@ The predictor variables for the study are:
 
 ```python
 ##################################
+# Setting up compatibility issues
+# between the scikit-learn and imblearn packages
+##################################
+# !pip uninstall scikit-learn --yes
+# !pip uninstall imblearn --yes
+# !pip install scikit-learn==1.2.2
+# !pip install imblearn
+```
+
+
+```python
+##################################
 # Loading Python Libraries
 ##################################
 import numpy as np
@@ -163,6 +175,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score
 from sklearn.model_selection import train_test_split, GridSearchCV
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import CondensedNearestNeighbour
 ```
 
 
@@ -4161,91 +4175,91 @@ for column in cancer_rate_imputed_numeric:
 
 
     
-![png](output_122_0.png)
+![png](output_123_0.png)
     
 
 
 
     
-![png](output_122_1.png)
+![png](output_123_1.png)
     
 
 
 
     
-![png](output_122_2.png)
+![png](output_123_2.png)
     
 
 
 
     
-![png](output_122_3.png)
+![png](output_123_3.png)
     
 
 
 
     
-![png](output_122_4.png)
+![png](output_123_4.png)
     
 
 
 
     
-![png](output_122_5.png)
+![png](output_123_5.png)
     
 
 
 
     
-![png](output_122_6.png)
+![png](output_123_6.png)
     
 
 
 
     
-![png](output_122_7.png)
+![png](output_123_7.png)
     
 
 
 
     
-![png](output_122_8.png)
+![png](output_123_8.png)
     
 
 
 
     
-![png](output_122_9.png)
+![png](output_123_9.png)
     
 
 
 
     
-![png](output_122_10.png)
+![png](output_123_10.png)
     
 
 
 
     
-![png](output_122_11.png)
+![png](output_123_11.png)
     
 
 
 
     
-![png](output_122_12.png)
+![png](output_123_12.png)
     
 
 
 
     
-![png](output_122_13.png)
+![png](output_123_13.png)
     
 
 
 
     
-![png](output_122_14.png)
+![png](output_123_14.png)
     
 
 
@@ -4477,7 +4491,7 @@ plt.show()
 
 
     
-![png](output_127_0.png)
+![png](output_128_0.png)
     
 
 
@@ -4514,7 +4528,7 @@ plot_correlation_matrix(cancer_rate_imputed_numeric_correlation,mask)
 
 
     
-![png](output_129_0.png)
+![png](output_130_0.png)
     
 
 
@@ -4611,79 +4625,79 @@ for column in cancer_rate_transformed_numeric:
 
 
     
-![png](output_135_0.png)
+![png](output_136_0.png)
     
 
 
 
     
-![png](output_135_1.png)
+![png](output_136_1.png)
     
 
 
 
     
-![png](output_135_2.png)
+![png](output_136_2.png)
     
 
 
 
     
-![png](output_135_3.png)
+![png](output_136_3.png)
     
 
 
 
     
-![png](output_135_4.png)
+![png](output_136_4.png)
     
 
 
 
     
-![png](output_135_5.png)
+![png](output_136_5.png)
     
 
 
 
     
-![png](output_135_6.png)
+![png](output_136_6.png)
     
 
 
 
     
-![png](output_135_7.png)
+![png](output_136_7.png)
     
 
 
 
     
-![png](output_135_8.png)
+![png](output_136_8.png)
     
 
 
 
     
-![png](output_135_9.png)
+![png](output_136_9.png)
     
 
 
 
     
-![png](output_135_10.png)
+![png](output_136_10.png)
     
 
 
 
     
-![png](output_135_11.png)
+![png](output_136_11.png)
     
 
 
 
     
-![png](output_135_12.png)
+![png](output_136_12.png)
     
 
 
@@ -4773,73 +4787,73 @@ for column in cancer_rate_scaled_numeric:
 
 
     
-![png](output_141_0.png)
+![png](output_142_0.png)
     
 
 
 
     
-![png](output_141_1.png)
+![png](output_142_1.png)
     
 
 
 
     
-![png](output_141_2.png)
+![png](output_142_2.png)
     
 
 
 
     
-![png](output_141_3.png)
+![png](output_142_3.png)
     
 
 
 
     
-![png](output_141_4.png)
+![png](output_142_4.png)
     
 
 
 
     
-![png](output_141_5.png)
+![png](output_142_5.png)
     
 
 
 
     
-![png](output_141_6.png)
+![png](output_142_6.png)
     
 
 
 
     
-![png](output_141_7.png)
+![png](output_142_7.png)
     
 
 
 
     
-![png](output_141_8.png)
+![png](output_142_8.png)
     
 
 
 
     
-![png](output_141_9.png)
+![png](output_142_9.png)
     
 
 
 
     
-![png](output_141_10.png)
+![png](output_142_10.png)
     
 
 
 
     
-![png](output_141_11.png)
+![png](output_142_11.png)
     
 
 
@@ -5022,7 +5036,7 @@ plt.show()
 
 
     
-![png](output_153_0.png)
+![png](output_154_0.png)
     
 
 
@@ -5079,7 +5093,7 @@ plt.show()
 
 
     
-![png](output_154_0.png)
+![png](output_155_0.png)
     
 
 
@@ -5376,7 +5390,7 @@ plt.show()
 
 
     
-![png](output_165_0.png)
+![png](output_166_0.png)
     
 
 
@@ -5504,6 +5518,7 @@ hyperparameter_grid = {
     'penalty': ['l1', 'l2'],
     'solver': ['liblinear','saga'],
     'class_weight': [None],
+    'max_iter': [500],
     'random_state': [88888888]}
 
 ##################################
@@ -5533,6 +5548,7 @@ optimal_logistic_regression.best_params_
 
     {'C': 1.0,
      'class_weight': None,
+     'max_iter': 500,
      'penalty': 'l1',
      'random_state': 88888888,
      'solver': 'liblinear'}
@@ -5542,7 +5558,7 @@ optimal_logistic_regression.best_params_
 
 ```python
 ##################################
-# Evaluating the optimal logistic regression model
+# Evaluating the optimal Logistic Regression model
 # on the train set
 ##################################
 optimal_logistic_regression_y_hat_train = optimal_logistic_regression.predict(X_train)
@@ -5629,7 +5645,7 @@ display(optimal_logistic_regression_performance_train)
 
 ```python
 ##################################
-# Evaluating the optimal logistic regression model
+# Evaluating the optimal Logistic Regression model
 # on the test set
 ##################################
 optimal_logistic_regression_y_hat_test = optimal_logistic_regression.predict(X_test)
@@ -6470,7 +6486,7 @@ plt.show()
 
 
     
-![png](output_194_0.png)
+![png](output_195_0.png)
     
 
 
@@ -6598,6 +6614,7 @@ hyperparameter_grid = {
     'penalty': ['l1', 'l2'],
     'solver': ['liblinear','saga'],
     'class_weight': [{0:0.25, 1:0.75}],
+    'max_iter': [500],
     'random_state': [88888888]}
 
 ##################################
@@ -6615,7 +6632,7 @@ weighted_logistic_regression = GridSearchCV(estimator = logistic_regression,
 weighted_logistic_regression.fit(X_train, y_train)
 
 ##################################
-# Determining the weighted hyperparameter
+# Determining the optimal hyperparameter
 # for the Logistic Regression model
 ##################################
 weighted_logistic_regression.best_score_ 
@@ -6627,6 +6644,7 @@ weighted_logistic_regression.best_params_
 
     {'C': 1.0,
      'class_weight': {0: 0.25, 1: 0.75},
+     'max_iter': 500,
      'penalty': 'l2',
      'random_state': 88888888,
      'solver': 'liblinear'}
@@ -6636,7 +6654,7 @@ weighted_logistic_regression.best_params_
 
 ```python
 ##################################
-# Evaluating the weighted logistic regression model
+# Evaluating the weighted Logistic Regression model
 # on the train set
 ##################################
 weighted_logistic_regression_y_hat_train = weighted_logistic_regression.predict(X_train)
@@ -6723,7 +6741,7 @@ display(weighted_logistic_regression_performance_train)
 
 ```python
 ##################################
-# Evaluating the weighted logistic regression model
+# Evaluating the weighted Logistic Regression model
 # on the test set
 ##################################
 weighted_logistic_regression_y_hat_test = weighted_logistic_regression.predict(X_test)
@@ -6845,7 +6863,7 @@ weighted_decision_tree = GridSearchCV(estimator = decision_tree,
 weighted_decision_tree.fit(X_train, y_train)
 
 ##################################
-# Determining the weighted hyperparameter
+# Determining the optimal hyperparameter
 # for the Decision Tree model
 ##################################
 weighted_decision_tree.best_score_ 
@@ -7077,7 +7095,7 @@ weighted_random_forest = GridSearchCV(estimator = random_forest,
 weighted_random_forest.fit(X_train, y_train)
 
 ##################################
-# Determining the weighted hyperparameter
+# Determining the optimal hyperparameter
 # for the Random Forest model
 ##################################
 weighted_random_forest.best_score_ 
@@ -7308,7 +7326,7 @@ weighted_support_vector_machine = GridSearchCV(estimator = support_vector_machin
 weighted_support_vector_machine.fit(X_train, y_train)
 
 ##################################
-# Determining the weighted hyperparameter
+# Determining the optimal hyperparameter
 # for the Support Vector Machine model
 ##################################
 weighted_support_vector_machine.best_score_ 
@@ -7503,21 +7521,1140 @@ display(weighted_support_vector_machine_performance_test)
 
 ### 1.8.1 Premodelling Data Description <a class="anchor" id="1.8.1"></a>
 
+
+```python
+##################################
+# Consolidating relevant numeric columns
+# and encoded categorical columns
+# after hypothesis testing
+##################################
+cancer_rate_premodelling = cancer_rate_preprocessed_all.drop(['AGRLND','POPDEN','GHGEMI','POPGRO','FORARE','HDICAT_H','HDICAT_M','HDICAT_L'], axis=1)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the filtered dataset
+##################################
+print('Dataset Dimensions: ')
+display(cancer_rate_premodelling.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (163, 9)
+
+
+
+```python
+##################################
+# Listing the column names and data types
+##################################
+print('Column Names and Data Types:')
+display(cancer_rate_premodelling.dtypes)
+```
+
+    Column Names and Data Types:
+    
+
+
+    URBPOP        float64
+    LIFEXP        float64
+    TUBINC        float64
+    DTHCMD        float64
+    CO2EMI        float64
+    GDPCAP        float64
+    EPISCO        float64
+    CANRAT       category
+    HDICAT_VH       uint8
+    dtype: object
+
+
+
+```python
+##################################
+# Gathering the pairplot for all variables
+##################################
+sns.pairplot(cancer_rate_premodelling, kind='reg')
+plt.show()
+```
+
+
+    
+![png](output_224_0.png)
+    
+
+
+
+```python
+##################################
+# Separating the target 
+# and predictor columns
+##################################
+X = cancer_rate_premodelling.drop('CANRAT', axis = 1)
+y = cancer_rate_premodelling['CANRAT'].cat.codes
+```
+
+
+```python
+##################################
+# Formulating the train and test data
+# using a 70-30 ratio
+##################################
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state= 88888888, stratify=y)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the train dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_train.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (114, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the train dataset
+##################################
+y_train.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.745614
+    1    0.254386
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Initiating an oversampling instance
+# on the train data using
+# Synthetic Minority Oversampling Technique
+##################################
+smote = SMOTE(random_state = 88888888)
+X_train_smote, y_train_smote = smote.fit_resample(X_train,y_train)
+```
+
+
+```python
+##################################
+# Performing a general exploration of the overampled train dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_train_smote.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (170, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the overampled train dataset
+##################################
+y_train_smote.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.5
+    1    0.5
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Performing a general exploration of the test dataset
+##################################
+print('Dataset Dimensions: ')
+display(X_test.shape)
+```
+
+    Dataset Dimensions: 
+    
+
+
+    (49, 8)
+
+
+
+```python
+##################################
+# Validating the class distribution of the test dataset
+##################################
+y_test.value_counts(normalize = True)
+```
+
+
+
+
+    0    0.755102
+    1    0.244898
+    dtype: float64
+
+
+
+
+```python
+##################################
+# Defining a function to compute
+# model performance
+##################################
+def model_performance_evaluation(y_true, y_pred):
+    metric_name = ['Accuracy','Precision','Recall','F1','AUROC']
+    metric_value = [accuracy_score(y_true, y_pred),
+                   precision_score(y_true, y_pred),
+                   recall_score(y_true, y_pred),
+                   f1_score(y_true, y_pred),
+                   roc_auc_score(y_true, y_pred)]    
+    metric_summary = pd.DataFrame(zip(metric_name, metric_value),
+                                  columns=['metric_name','metric_value']) 
+    return(metric_summary)
+```
+
 ### 1.8.2 Logistic Regression <a class="anchor" id="1.8.2"></a>
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Logistic Regression model
+##################################
+logistic_regression = LogisticRegression()
+
+##################################
+# Defining the hyperparameters for the
+# Logistic Regression model
+##################################
+hyperparameter_grid = {
+    'C': [1.0],
+    'penalty': ['l1', 'l2'],
+    'solver': ['liblinear','saga'],
+    'class_weight': [None],
+    'max_iter': [500],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Logistic Regression model
+##################################
+upsampled_logistic_regression = GridSearchCV(estimator = logistic_regression, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the upsampled Logistic Regression model
+##################################
+upsampled_logistic_regression.fit(X_train_smote, y_train_smote)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Logistic Regression model
+##################################
+upsampled_logistic_regression.best_score_ 
+upsampled_logistic_regression.best_params_
+```
+
+
+
+
+    {'C': 1.0,
+     'class_weight': None,
+     'max_iter': 500,
+     'penalty': 'l1',
+     'random_state': 88888888,
+     'solver': 'saga'}
+
+
+
+
+```python
+##################################
+# Evaluating the upsampled Logistic Regression model
+# on the train set
+##################################
+upsampled_logistic_regression_y_hat_train = upsampled_logistic_regression.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+upsampled_logistic_regression_performance_train = model_performance_evaluation(y_train, upsampled_logistic_regression_y_hat_train)
+upsampled_logistic_regression_performance_train['model'] = ['upsampled_logistic_regression'] * 5
+upsampled_logistic_regression_performance_train['set'] = ['train'] * 5
+print('Upsampled Logistic Regression Model Performance on Train Data: ')
+display(upsampled_logistic_regression_performance_train)
+```
+
+    Upsampled Logistic Regression Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.964912</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.903226</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.965517</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.933333</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.965112</td>
+      <td>upsampled_logistic_regression</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the upsampled Logistic Regression model
+# on the test set
+##################################
+upsampled_logistic_regression_y_hat_test = upsampled_logistic_regression.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+upsampled_logistic_regression_performance_test = model_performance_evaluation(y_test, upsampled_logistic_regression_y_hat_test)
+upsampled_logistic_regression_performance_test['model'] = ['upsampled_logistic_regression'] * 5
+upsampled_logistic_regression_performance_test['set'] = ['test'] * 5
+print('Upsampled Logistic Regression Model Performance on Test Data: ')
+display(upsampled_logistic_regression_performance_test)
+```
+
+    Upsampled Logistic Regression Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.818182</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.861486</td>
+      <td>upsampled_logistic_regression</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ### 1.8.3 Decision Trees <a class="anchor" id="1.8.3"></a>
 
 [Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
 
+
+```python
+##################################
+# Creating an instance of the 
+# Decision Tree model
+##################################
+decision_tree = DecisionTreeClassifier()
+
+##################################
+# Defining the hyperparameters for the
+# Decision Tree model
+##################################
+hyperparameter_grid = {
+    'criterion': ['gini','entropy','log_loss'],
+    'max_depth': [3,5,7],
+    'min_samples_leaf': [3,5,10],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Decision Tree model
+##################################
+upsampled_decision_tree = GridSearchCV(estimator = decision_tree, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the upsampled Decision Tree model
+##################################
+upsampled_decision_tree.fit(X_train_smote, y_train_smote)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Decision Tree model
+##################################
+upsampled_decision_tree.best_score_ 
+upsampled_decision_tree.best_params_
+```
+
+
+
+
+    {'class_weight': None,
+     'criterion': 'entropy',
+     'max_depth': 3,
+     'min_samples_leaf': 5,
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the upsampled Decision Tree model
+# on the train set
+##################################
+upsampled_decision_tree_y_hat_train = upsampled_decision_tree.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+upsampled_decision_tree_performance_train = model_performance_evaluation(y_train, upsampled_decision_tree_y_hat_train)
+upsampled_decision_tree_performance_train['model'] = ['upsampled_decision_tree'] * 5
+upsampled_decision_tree_performance_train['set'] = ['train'] * 5
+print('Upsampled Decision Tree Model Performance on Train Data: ')
+display(upsampled_decision_tree_performance_train)
+```
+
+    Upsampled Decision Tree Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.921053</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.763158</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.865672</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.947059</td>
+      <td>upsampled_decision_tree</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the upsampled Decision Tree model
+# on the test set
+##################################
+upsampled_decision_tree_y_hat_test = upsampled_decision_tree.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+upsampled_decision_tree_performance_test = model_performance_evaluation(y_test, upsampled_decision_tree_y_hat_test)
+upsampled_decision_tree_performance_test['model'] = ['upsampled_decision_tree'] * 5
+upsampled_decision_tree_performance_test['set'] = ['test'] * 5
+print('Upsampled Decision Tree Model Performance on Test Data: ')
+display(upsampled_decision_tree_performance_test)
+
+```
+
+    Upsampled Decision Tree Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.769231</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.833333</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.800000</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.876126</td>
+      <td>upsampled_decision_tree</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 ### 1.8.4 Random Forest <a class="anchor" id="1.8.4"></a>
 
 [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
 
+
+```python
+##################################
+# Creating an instance of the 
+# Random Forest model
+##################################
+random_forest = RandomForestClassifier()
+
+##################################
+# Defining the hyperparameters for the
+# Random Forest model
+##################################
+hyperparameter_grid = {
+    'criterion': ['gini','entropy','log_loss'],
+    'max_depth': [3,5,7],
+    'min_samples_leaf': [3,5,10],
+    'n_estimators': [3,5,7],
+    'max_features':['sqrt', 'log2'],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Random Forest model
+##################################
+upsampled_random_forest = GridSearchCV(estimator = random_forest, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the upsampled Random Forest model
+##################################
+upsampled_random_forest.fit(X_train_smote, y_train_smote)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Random Forest model
+##################################
+upsampled_random_forest.best_score_ 
+upsampled_random_forest.best_params_
+```
+
+
+
+
+    {'class_weight': None,
+     'criterion': 'entropy',
+     'max_depth': 7,
+     'max_features': 'sqrt',
+     'min_samples_leaf': 3,
+     'n_estimators': 7,
+     'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the upsampled Random Forest model
+# on the train set
+##################################
+upsampled_random_forest_y_hat_train = upsampled_random_forest.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+upsampled_random_forest_performance_train = model_performance_evaluation(y_train, upsampled_random_forest_y_hat_train)
+upsampled_random_forest_performance_train['model'] = ['upsampled_random_forest'] * 5
+upsampled_random_forest_performance_train['set'] = ['train'] * 5
+print('Upsampled Random Forest Model Performance on Train Data: ')
+display(upsampled_random_forest_performance_train)
+```
+
+    Upsampled Random Forest Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.982456</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.935484</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.966667</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.988235</td>
+      <td>upsampled_random_forest</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the upsampled Random Forest model
+# on the test set
+##################################
+upsampled_random_forest_y_hat_test = upsampled_random_forest.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+upsampled_random_forest_performance_test = model_performance_evaluation(y_test, upsampled_random_forest_y_hat_test)
+upsampled_random_forest_performance_test['model'] = ['upsampled_random_forest'] * 5
+upsampled_random_forest_performance_test['set'] = ['test'] * 5
+print('Upsampled Random Forest Model Performance on Test Data: ')
+display(upsampled_random_forest_performance_test)
+```
+
+    Upsampled Random Forest Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.818182</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.861486</td>
+      <td>upsampled_random_forest</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
 ### 1.8.5 Support Vector Machine <a class="anchor" id="1.8.6"></a>
 
 [Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
+
+
+```python
+##################################
+# Creating an instance of the 
+# Support Vector Machine model
+##################################
+support_vector_machine = SVC()
+
+##################################
+# Defining the hyperparameters for the
+# Support Vector Machine model
+##################################
+hyperparameter_grid = {
+    'C': [1.0],
+    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+    'class_weight': [None],
+    'random_state': [88888888]}
+
+##################################
+# Defining the hyperparameters for the
+# Support Vector Machine model
+##################################
+upsampled_support_vector_machine = GridSearchCV(estimator = support_vector_machine, 
+                                           param_grid = hyperparameter_grid,
+                                           n_jobs = -1,
+                                           scoring='f1')
+
+##################################
+# Fitting the upsampled Support Vector Machine model
+##################################
+upsampled_support_vector_machine.fit(X_train_smote, y_train_smote)
+
+##################################
+# Determining the optimal hyperparameter
+# for the Support Vector Machine model
+##################################
+upsampled_support_vector_machine.best_score_ 
+upsampled_support_vector_machine.best_params_
+```
+
+
+
+
+    {'C': 1.0, 'class_weight': None, 'kernel': 'linear', 'random_state': 88888888}
+
+
+
+
+```python
+##################################
+# Evaluating the upsampled Support Vector Machine model
+# on the train set
+##################################
+upsampled_support_vector_machine_y_hat_train = upsampled_support_vector_machine.predict(X_train)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+upsampled_support_vector_machine_performance_train = model_performance_evaluation(y_train, upsampled_support_vector_machine_y_hat_train)
+upsampled_support_vector_machine_performance_train['model'] = ['upsampled_support_vector_machine'] * 5
+upsampled_support_vector_machine_performance_train['set'] = ['train'] * 5
+print('Upsampled Support Vector Machine Model Performance on Train Data: ')
+display(upsampled_support_vector_machine_performance_train)
+```
+
+    Upsampled Support Vector Machine Model Performance on Train Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.973684</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.906250</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.950820</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.982353</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>train</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+##################################
+# Evaluating the upsampled Support Vector Machine model
+# on the test set
+##################################
+upsampled_support_vector_machine_y_hat_test = upsampled_support_vector_machine.predict(X_test)
+
+##################################
+# Gathering the model evaluation metrics
+##################################
+upsampled_support_vector_machine_performance_test = model_performance_evaluation(y_test, upsampled_support_vector_machine_y_hat_test)
+upsampled_support_vector_machine_performance_test['model'] = ['upsampled_support_vector_machine'] * 5
+upsampled_support_vector_machine_performance_test['set'] = ['test'] * 5
+print('Upsampled Support Vector Machine Model Performance on Test Data: ')
+display(upsampled_support_vector_machine_performance_test)
+```
+
+    Upsampled Support Vector Machine Model Performance on Test Data: 
+    
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>metric_name</th>
+      <th>metric_value</th>
+      <th>model</th>
+      <th>set</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Accuracy</td>
+      <td>0.897959</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Precision</td>
+      <td>0.818182</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>F1</td>
+      <td>0.782609</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>AUROC</td>
+      <td>0.847973</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 ## 1.9. Model Development With CNN Downsampling <a class="anchor" id="1.9"></a>
 

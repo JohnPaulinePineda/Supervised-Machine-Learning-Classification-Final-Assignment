@@ -7774,7 +7774,7 @@ display(weighted_support_vector_machine_performance_test)
     * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
 2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
     * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
-3. The extended model training data by upsampling the minority HIGH <span style="color: #FF0000">CANRAT</span> category applying SMOTE was used. 
+3. The [SMOTE](https://imbalanced-learn.org/stable/references/generated/imblearn.over_sampling.SMOTE.html) algorithm from the <mark style="background-color: #CCECFF"><b>imblearn.over_sampling</b></mark> Python library API was implemented. The extended model training data by upsampling the minority HIGH <span style="color: #FF0000">CANRAT</span> category applying SMOTE was used. 
 
 
 ```python
@@ -9034,7 +9034,7 @@ display(upsampled_support_vector_machine_performance_test)
     * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
 2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
     * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
-3. The reduced model training data by downsampling the majority LOW <span style="color: #FF0000">CANRAT</span> category applying CNN was used.
+3. The [CNN](https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.CondensedNearestNeighbour.html) algorithm from the <mark style="background-color: #CCECFF"><b>imblearn.under_sampling</b></mark> Python library API was implemented. The reduced model training data by downsampling the majority LOW <span style="color: #FF0000">CANRAT</span> category applying CNN was used.
 
 
 ```python
@@ -10283,6 +10283,32 @@ display(downsampled_support_vector_machine_performance_test)
 [Model Stacking](https://www.manning.com/books/ensemble-methods-for-machine-learning) - also known as stacked generalization, is an ensemble approach which involves creating a variety of base learners and using them to create intermediate predictions, one for each learned model. A meta-model is incorporated that gains knowledge of the same target from intermediate predictions. Unlike bagging, in stacking, the models are typically different (e.g. not all decision trees) and fit on the same dataset (e.g. instead of samples of the training dataset). Unlike boosting, in stacking, a single model is used to learn how to best combine the predictions from the contributing models (e.g. instead of a sequence of models that correct the predictions of prior models). Stacking is appropriate when the predictions made by the base learners or the errors in predictions made by the models have minimal correlation. Achieving an improvement in performance is dependent upon the choice of base learners and whether they are sufficiently skillful in their predictions.
 
 ### 1.10.1 Premodelling Data Description <a class="anchor" id="1.10.1"></a>
+
+1. Among the formulated versions of the [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html), the model which applied class weights demonstrated the best independent test model performance. Considerable difference in the apparent and independent test model performance was observed, indicative of the presence of moderate model overfitting.
+    * **Accuracy** = 0.9387
+    * **Precision** = 0.8461
+    * **Recall** = 0.9167
+    * **F1 Score** = 0.8800
+    * **AUROC** = 0.9313
+2. Among the formulated versions of the [decision tree model](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html), the model which applied upsampling of the minority class using SMOTE demonstrated the best independent test model performance. Considerable difference in the apparent and independent test model performance was observed, indicative of the presence of moderate model overfitting.
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.7692
+    * **Recall** = 0.8333
+    * **F1 Score** = 0.8000
+    * **AUROC** = 0.8761
+3. Among the formulated versions of the [random forest model](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#), the model which applied upsampling of the minority class using SMOTE demonstrated the best independent test model performance. High difference in the apparent and independent test model performance was observed, indicative of the presence of excessive model overfitting.
+    * **Accuracy** = 0.9387
+    * **Precision** = 0.8461
+    * **Recall** = 0.9167
+    * **F1 Score** = 0.8800
+    * **AUROC** = 0.9313
+4. Among the formulated versions of the [support vector machine model](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html), the model which applied upsampling of the minority class using SMOTE demonstrated the best independent test model performance. High difference in the apparent and independent test model performance was observed, indicative of the presence of excessive model overfitting.
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.8181
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.7826
+    * **AUROC** = 0.8479
+4. All individual formulated models which applied upsampling of the minority class using SMOTE were used to generate the base-learners for the stacking algorithm.
 
 
 ```python
@@ -12148,7 +12174,7 @@ plt.show()
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
 
-1. The [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+1. The [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented as a meta-learner for the stacking algorithm. 
 2. The model used default hyperparameters with no tuning applied:
     * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
     * <span style="color: #FF0000">penalty</span> = penalty norm held constant at a value of L2
@@ -12158,10 +12184,10 @@ plt.show()
 3. The original data reflecting a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
 4. The apparent model performance of the optimal model is summarized as follows:
     * **Accuracy** = 0.9736
-    * **Precision** = 0.9333
-    * **Recall** = 0.9655
-    * **F1 Score** = 0.9491
-    * **AUROC** = 0.9709
+    * **Precision** = 0.9062
+    * **Recall** = 1.0000
+    * **F1 Score** = 0.9508
+    * **AUROC** = 0.9823
 5. The independent test model performance of the final model is summarized as follows:
     * **Accuracy** = 0.9183
     * **Precision** = 0.9000
@@ -12175,29 +12201,29 @@ plt.show()
 ##################################
 # Formulating the base learners
 # using the optimal hyperparameters
-# for the weighted models
+# for the upsampled models
 ##################################
 base_learners = [('LR', LogisticRegression(C=1.0,
-                                          class_weight={0: 0.25, 1: 0.75},
+                                          class_weight=None,
                                           max_iter=500,
-                                          penalty='l2',
+                                          penalty='l1',
                                           random_state=88888888,
-                                          solver='liblinear')),
-                ('DT', DecisionTreeClassifier(class_weight={0: 0.25, 1: 0.75},
-                                              criterion='gini',
+                                          solver='saga')),
+                ('DT', DecisionTreeClassifier(class_weight=None,
+                                              criterion='entropy',
                                               max_depth=3,
-                                              min_samples_leaf=3,
+                                              min_samples_leaf=5,
                                               random_state=88888888)),
-                ('RF', RandomForestClassifier(class_weight={0: 0.25, 1: 0.75},
-                                              criterion='gini',
-                                              max_depth=5,
+                ('RF', RandomForestClassifier(class_weight=None,
+                                              criterion='entropy',
+                                              max_depth=7,
                                               max_features='sqrt',
                                               min_samples_leaf=3,
                                               n_estimators=100,
                                               random_state=88888888)),
-               ('SVM', SVC(class_weight={0: 0.25, 1: 0.75},
+               ('SVM', SVC(class_weight=None,
                            C=1.0,
-                           kernel='poly',
+                           kernel='linear',
                            random_state=88888888))]
 ```
 
@@ -12206,10 +12232,9 @@ base_learners = [('LR', LogisticRegression(C=1.0,
 ##################################
 # Formulating the meta learner
 # using default hyperparameters
-# but with class weights
 ##################################
 meta_learner = LogisticRegression(C=1.0,
-                                  class_weight={0: 0.25, 1: 0.75},
+                                  class_weight=None,
                                   max_iter=500,
                                   random_state=88888888)
 ```
@@ -12226,67 +12251,52 @@ stacked_logistic_regression = StackingClassifier(estimators=base_learners, final
 
 ```python
 ##################################
-# Fitting the weighted Logistic Regression model
+# Fitting the meta Logistic Regression model
 ##################################
-stacked_logistic_regression.fit(X_train, y_train)
+stacked_logistic_regression.fit(X_train_smote, y_train_smote)
 ```
 
 
 
 
 <style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>StackingClassifier(estimators=[(&#x27;LR&#x27;,
-                                LogisticRegression(class_weight={0: 0.25,
-                                                                 1: 0.75},
-                                                   max_iter=500,
+                                LogisticRegression(max_iter=500, penalty=&#x27;l1&#x27;,
                                                    random_state=88888888,
-                                                   solver=&#x27;liblinear&#x27;)),
+                                                   solver=&#x27;saga&#x27;)),
                                (&#x27;DT&#x27;,
-                                DecisionTreeClassifier(class_weight={0: 0.25,
-                                                                     1: 0.75},
+                                DecisionTreeClassifier(criterion=&#x27;entropy&#x27;,
                                                        max_depth=3,
-                                                       min_samples_leaf=3,
+                                                       min_samples_leaf=5,
                                                        random_state=88888888)),
                                (&#x27;RF&#x27;,
-                                RandomForestClassifier(class_weight={0: 0.25,
-                                                                     1: 0.75},
-                                                       max_depth=5,
+                                RandomForestClassifier(criterion=&#x27;entropy&#x27;,
+                                                       max_depth=7,
                                                        min_samples_leaf=3,
                                                        random_state=88888888)),
                                (&#x27;SVM&#x27;,
-                                SVC(class_weight={0: 0.25, 1: 0.75},
-                                    kernel=&#x27;poly&#x27;, random_state=88888888))],
-                   final_estimator=LogisticRegression(class_weight={0: 0.25,
-                                                                    1: 0.75},
-                                                      max_iter=500,
+                                SVC(kernel=&#x27;linear&#x27;, random_state=88888888))],
+                   final_estimator=LogisticRegression(max_iter=500,
                                                       random_state=88888888))</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" ><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">StackingClassifier</label><div class="sk-toggleable__content"><pre>StackingClassifier(estimators=[(&#x27;LR&#x27;,
-                                LogisticRegression(class_weight={0: 0.25,
-                                                                 1: 0.75},
-                                                   max_iter=500,
+                                LogisticRegression(max_iter=500, penalty=&#x27;l1&#x27;,
                                                    random_state=88888888,
-                                                   solver=&#x27;liblinear&#x27;)),
+                                                   solver=&#x27;saga&#x27;)),
                                (&#x27;DT&#x27;,
-                                DecisionTreeClassifier(class_weight={0: 0.25,
-                                                                     1: 0.75},
+                                DecisionTreeClassifier(criterion=&#x27;entropy&#x27;,
                                                        max_depth=3,
-                                                       min_samples_leaf=3,
+                                                       min_samples_leaf=5,
                                                        random_state=88888888)),
                                (&#x27;RF&#x27;,
-                                RandomForestClassifier(class_weight={0: 0.25,
-                                                                     1: 0.75},
-                                                       max_depth=5,
+                                RandomForestClassifier(criterion=&#x27;entropy&#x27;,
+                                                       max_depth=7,
                                                        min_samples_leaf=3,
                                                        random_state=88888888)),
                                (&#x27;SVM&#x27;,
-                                SVC(class_weight={0: 0.25, 1: 0.75},
-                                    kernel=&#x27;poly&#x27;, random_state=88888888))],
-                   final_estimator=LogisticRegression(class_weight={0: 0.25,
-                                                                    1: 0.75},
-                                                      max_iter=500,
-                                                      random_state=88888888))</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>LR</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(class_weight={0: 0.25, 1: 0.75}, max_iter=500,
-                   random_state=88888888, solver=&#x27;liblinear&#x27;)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>DT</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">DecisionTreeClassifier</label><div class="sk-toggleable__content"><pre>DecisionTreeClassifier(class_weight={0: 0.25, 1: 0.75}, max_depth=3,
-                       min_samples_leaf=3, random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>RF</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestClassifier</label><div class="sk-toggleable__content"><pre>RandomForestClassifier(class_weight={0: 0.25, 1: 0.75}, max_depth=5,
-                       min_samples_leaf=3, random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>SVM</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label sk-toggleable__label-arrow">SVC</label><div class="sk-toggleable__content"><pre>SVC(class_weight={0: 0.25, 1: 0.75}, kernel=&#x27;poly&#x27;, random_state=88888888)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>final_estimator</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox" ><label for="sk-estimator-id-6" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(class_weight={0: 0.25, 1: 0.75}, max_iter=500,
-                   random_state=88888888)</pre></div></div></div></div></div></div></div></div></div></div></div></div>
+                                SVC(kernel=&#x27;linear&#x27;, random_state=88888888))],
+                   final_estimator=LogisticRegression(max_iter=500,
+                                                      random_state=88888888))</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>LR</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(max_iter=500, penalty=&#x27;l1&#x27;, random_state=88888888,
+                   solver=&#x27;saga&#x27;)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>DT</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">DecisionTreeClassifier</label><div class="sk-toggleable__content"><pre>DecisionTreeClassifier(criterion=&#x27;entropy&#x27;, max_depth=3, min_samples_leaf=5,
+                       random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>RF</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestClassifier</label><div class="sk-toggleable__content"><pre>RandomForestClassifier(criterion=&#x27;entropy&#x27;, max_depth=7, min_samples_leaf=3,
+                       random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>SVM</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label sk-toggleable__label-arrow">SVC</label><div class="sk-toggleable__content"><pre>SVC(kernel=&#x27;linear&#x27;, random_state=88888888)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>final_estimator</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox" ><label for="sk-estimator-id-6" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(max_iter=500, random_state=88888888)</pre></div></div></div></div></div></div></div></div></div></div></div></div>
 
 
 
@@ -12350,28 +12360,28 @@ display(stacked_logistic_regression_performance_train)
     <tr>
       <th>1</th>
       <td>Precision</td>
-      <td>0.933333</td>
+      <td>0.906250</td>
       <td>stacked_logistic_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Recall</td>
-      <td>0.965517</td>
+      <td>1.000000</td>
       <td>stacked_logistic_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>3</th>
       <td>F1</td>
-      <td>0.949153</td>
+      <td>0.950820</td>
       <td>stacked_logistic_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>4</th>
       <td>AUROC</td>
-      <td>0.970994</td>
+      <td>0.982353</td>
       <td>stacked_logistic_regression</td>
       <td>train</td>
     </tr>
@@ -12473,6 +12483,44 @@ display(stacked_logistic_regression_performance_test)
 ## 1.11. Consolidated Findings <a class="anchor" id="1.11"></a>
 
 
+1. Among the formulated versions of the [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html), the model which applied upsampling of the minority class using SMOTE was used as a base learner for the model stacking algorithm.
+    * **Accuracy** = 0.9183
+    * **Precision** = 0.9000
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.8181
+    * **AUROC** = 0.8614
+2. Among the formulated versions of the [decision tree model](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html), the model which applied upsampling of the minority class using SMOTE was used as a base learner for the model stacking algorithm.
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.7692
+    * **Recall** = 0.8333
+    * **F1 Score** = 0.8000
+    * **AUROC** = 0.8761
+3. Among the formulated versions of the [random forest model](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#), the model which applied upsampling of the minority class using SMOTE was used as a base learner for the model stacking algorithm.
+    * **Accuracy** = 0.9387
+    * **Precision** = 0.8461
+    * **Recall** = 0.9167
+    * **F1 Score** = 0.8800
+    * **AUROC** = 0.9313
+4. Among the formulated versions of the [support vector machine model](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html), the model which applied upsampling of the minority class using SMOTE was used as a base learner for the model stacking algorithm.
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.8181
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.7826
+    * **AUROC** = 0.8479
+5. The stacked [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) comprised of the individual base learners demonstrated sufficient class discrmination:
+    * **Accuracy** = 0.9183
+    * **Precision** = 0.9000
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.8181
+    * **AUROC** = 0.8614
+5. Comparing all results from the formulated base and stacked models formulated, the [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) which applied class weights still demonstrated the best independent test model performance and was selected as the final model for classification. 
+    * **Accuracy** = 0.9387
+    * **Precision** = 0.8461
+    * **Recall** = 0.9167
+    * **F1 Score** = 0.8800
+    * **AUROC** = 0.9313    
+
+
 ```python
 ##################################
 # Consolidating all the
@@ -12481,12 +12529,14 @@ display(stacked_logistic_regression_performance_test)
 ##################################
 base_meta_learner_performance_comparison = pd.concat([weighted_logistic_regression_performance_train, 
                                                       weighted_logistic_regression_performance_test,
-                                                      weighted_decision_tree_performance_train, 
-                                                      weighted_decision_tree_performance_test,
-                                                      weighted_random_forest_performance_train, 
-                                                      weighted_random_forest_performance_test,
-                                                      weighted_support_vector_machine_performance_train, 
-                                                      weighted_support_vector_machine_performance_test,
+                                                      upsampled_logistic_regression_performance_train, 
+                                                      upsampled_logistic_regression_performance_test,
+                                                      upsampled_decision_tree_performance_train, 
+                                                      upsampled_decision_tree_performance_test,
+                                                      upsampled_random_forest_performance_train, 
+                                                      upsampled_random_forest_performance_test,
+                                                      upsampled_support_vector_machine_performance_train, 
+                                                      upsampled_support_vector_machine_performance_test,
                                                       stacked_logistic_regression_performance_train, 
                                                       stacked_logistic_regression_performance_test], 
                                                      ignore_index=True)
@@ -12596,278 +12646,348 @@ display(base_meta_learner_performance_comparison)
     <tr>
       <th>10</th>
       <td>Accuracy</td>
-      <td>0.956140</td>
-      <td>weighted_decision_tree</td>
+      <td>0.964912</td>
+      <td>upsampled_logistic_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>11</th>
       <td>Precision</td>
-      <td>0.852941</td>
-      <td>weighted_decision_tree</td>
+      <td>0.903226</td>
+      <td>upsampled_logistic_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>12</th>
       <td>Recall</td>
-      <td>1.000000</td>
-      <td>weighted_decision_tree</td>
+      <td>0.965517</td>
+      <td>upsampled_logistic_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>13</th>
       <td>F1</td>
-      <td>0.920635</td>
-      <td>weighted_decision_tree</td>
+      <td>0.933333</td>
+      <td>upsampled_logistic_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>14</th>
       <td>AUROC</td>
-      <td>0.970588</td>
-      <td>weighted_decision_tree</td>
+      <td>0.965112</td>
+      <td>upsampled_logistic_regression</td>
       <td>train</td>
     </tr>
     <tr>
       <th>15</th>
       <td>Accuracy</td>
-      <td>0.897959</td>
-      <td>weighted_decision_tree</td>
+      <td>0.918367</td>
+      <td>upsampled_logistic_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>16</th>
       <td>Precision</td>
-      <td>0.769231</td>
-      <td>weighted_decision_tree</td>
+      <td>0.900000</td>
+      <td>upsampled_logistic_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>17</th>
       <td>Recall</td>
-      <td>0.833333</td>
-      <td>weighted_decision_tree</td>
+      <td>0.750000</td>
+      <td>upsampled_logistic_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>18</th>
       <td>F1</td>
-      <td>0.800000</td>
-      <td>weighted_decision_tree</td>
+      <td>0.818182</td>
+      <td>upsampled_logistic_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>19</th>
       <td>AUROC</td>
-      <td>0.876126</td>
-      <td>weighted_decision_tree</td>
+      <td>0.861486</td>
+      <td>upsampled_logistic_regression</td>
       <td>test</td>
     </tr>
     <tr>
       <th>20</th>
       <td>Accuracy</td>
-      <td>0.973684</td>
-      <td>weighted_random_forest</td>
+      <td>0.921053</td>
+      <td>upsampled_decision_tree</td>
       <td>train</td>
     </tr>
     <tr>
       <th>21</th>
       <td>Precision</td>
-      <td>0.906250</td>
-      <td>weighted_random_forest</td>
+      <td>0.763158</td>
+      <td>upsampled_decision_tree</td>
       <td>train</td>
     </tr>
     <tr>
       <th>22</th>
       <td>Recall</td>
       <td>1.000000</td>
-      <td>weighted_random_forest</td>
+      <td>upsampled_decision_tree</td>
       <td>train</td>
     </tr>
     <tr>
       <th>23</th>
       <td>F1</td>
-      <td>0.950820</td>
-      <td>weighted_random_forest</td>
+      <td>0.865672</td>
+      <td>upsampled_decision_tree</td>
       <td>train</td>
     </tr>
     <tr>
       <th>24</th>
       <td>AUROC</td>
-      <td>0.982353</td>
-      <td>weighted_random_forest</td>
+      <td>0.947059</td>
+      <td>upsampled_decision_tree</td>
       <td>train</td>
     </tr>
     <tr>
       <th>25</th>
       <td>Accuracy</td>
       <td>0.897959</td>
-      <td>weighted_random_forest</td>
+      <td>upsampled_decision_tree</td>
       <td>test</td>
     </tr>
     <tr>
       <th>26</th>
       <td>Precision</td>
-      <td>0.888889</td>
-      <td>weighted_random_forest</td>
+      <td>0.769231</td>
+      <td>upsampled_decision_tree</td>
       <td>test</td>
     </tr>
     <tr>
       <th>27</th>
       <td>Recall</td>
-      <td>0.666667</td>
-      <td>weighted_random_forest</td>
+      <td>0.833333</td>
+      <td>upsampled_decision_tree</td>
       <td>test</td>
     </tr>
     <tr>
       <th>28</th>
       <td>F1</td>
-      <td>0.761905</td>
-      <td>weighted_random_forest</td>
+      <td>0.800000</td>
+      <td>upsampled_decision_tree</td>
       <td>test</td>
     </tr>
     <tr>
       <th>29</th>
       <td>AUROC</td>
-      <td>0.819820</td>
-      <td>weighted_random_forest</td>
+      <td>0.876126</td>
+      <td>upsampled_decision_tree</td>
       <td>test</td>
     </tr>
     <tr>
       <th>30</th>
       <td>Accuracy</td>
-      <td>0.964912</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.991228</td>
+      <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>31</th>
       <td>Precision</td>
-      <td>0.962963</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.966667</td>
+      <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>32</th>
       <td>Recall</td>
-      <td>0.896552</td>
-      <td>weighted_support_vector_machine</td>
+      <td>1.000000</td>
+      <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>33</th>
       <td>F1</td>
-      <td>0.928571</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.983051</td>
+      <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>34</th>
       <td>AUROC</td>
-      <td>0.942394</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.994118</td>
+      <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>35</th>
       <td>Accuracy</td>
-      <td>0.877551</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.918367</td>
+      <td>upsampled_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>36</th>
       <td>Precision</td>
-      <td>0.875000</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.900000</td>
+      <td>upsampled_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>37</th>
       <td>Recall</td>
-      <td>0.583333</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.750000</td>
+      <td>upsampled_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>38</th>
       <td>F1</td>
-      <td>0.700000</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.818182</td>
+      <td>upsampled_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>39</th>
       <td>AUROC</td>
-      <td>0.778153</td>
-      <td>weighted_support_vector_machine</td>
+      <td>0.861486</td>
+      <td>upsampled_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>40</th>
       <td>Accuracy</td>
       <td>0.973684</td>
-      <td>stacked_logistic_regression</td>
+      <td>upsampled_support_vector_machine</td>
       <td>train</td>
     </tr>
     <tr>
       <th>41</th>
       <td>Precision</td>
-      <td>0.933333</td>
-      <td>stacked_logistic_regression</td>
+      <td>0.906250</td>
+      <td>upsampled_support_vector_machine</td>
       <td>train</td>
     </tr>
     <tr>
       <th>42</th>
       <td>Recall</td>
-      <td>0.965517</td>
-      <td>stacked_logistic_regression</td>
+      <td>1.000000</td>
+      <td>upsampled_support_vector_machine</td>
       <td>train</td>
     </tr>
     <tr>
       <th>43</th>
       <td>F1</td>
-      <td>0.949153</td>
-      <td>stacked_logistic_regression</td>
+      <td>0.950820</td>
+      <td>upsampled_support_vector_machine</td>
       <td>train</td>
     </tr>
     <tr>
       <th>44</th>
       <td>AUROC</td>
-      <td>0.970994</td>
-      <td>stacked_logistic_regression</td>
+      <td>0.982353</td>
+      <td>upsampled_support_vector_machine</td>
       <td>train</td>
     </tr>
     <tr>
       <th>45</th>
       <td>Accuracy</td>
-      <td>0.918367</td>
-      <td>stacked_logistic_regression</td>
+      <td>0.897959</td>
+      <td>upsampled_support_vector_machine</td>
       <td>test</td>
     </tr>
     <tr>
       <th>46</th>
       <td>Precision</td>
-      <td>0.900000</td>
-      <td>stacked_logistic_regression</td>
+      <td>0.818182</td>
+      <td>upsampled_support_vector_machine</td>
       <td>test</td>
     </tr>
     <tr>
       <th>47</th>
       <td>Recall</td>
       <td>0.750000</td>
-      <td>stacked_logistic_regression</td>
+      <td>upsampled_support_vector_machine</td>
       <td>test</td>
     </tr>
     <tr>
       <th>48</th>
+      <td>F1</td>
+      <td>0.782609</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>49</th>
+      <td>AUROC</td>
+      <td>0.847973</td>
+      <td>upsampled_support_vector_machine</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>50</th>
+      <td>Accuracy</td>
+      <td>0.973684</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>Precision</td>
+      <td>0.906250</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>52</th>
+      <td>Recall</td>
+      <td>1.000000</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>53</th>
+      <td>F1</td>
+      <td>0.950820</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>54</th>
+      <td>AUROC</td>
+      <td>0.982353</td>
+      <td>stacked_logistic_regression</td>
+      <td>train</td>
+    </tr>
+    <tr>
+      <th>55</th>
+      <td>Accuracy</td>
+      <td>0.918367</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>56</th>
+      <td>Precision</td>
+      <td>0.900000</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>57</th>
+      <td>Recall</td>
+      <td>0.750000</td>
+      <td>stacked_logistic_regression</td>
+      <td>test</td>
+    </tr>
+    <tr>
+      <th>58</th>
       <td>F1</td>
       <td>0.818182</td>
       <td>stacked_logistic_regression</td>
       <td>test</td>
     </tr>
     <tr>
-      <th>49</th>
+      <th>59</th>
       <td>AUROC</td>
       <td>0.861486</td>
       <td>stacked_logistic_regression</td>
@@ -12934,23 +13054,28 @@ base_meta_learner_performance_comparison_F1_plot
       <td>0.880000</td>
     </tr>
     <tr>
-      <th>weighted_decision_tree</th>
-      <td>0.920635</td>
+      <th>upsampled_logistic_regression</th>
+      <td>0.933333</td>
+      <td>0.818182</td>
+    </tr>
+    <tr>
+      <th>upsampled_decision_tree</th>
+      <td>0.865672</td>
       <td>0.800000</td>
     </tr>
     <tr>
-      <th>weighted_random_forest</th>
-      <td>0.950820</td>
-      <td>0.761905</td>
+      <th>upsampled_random_forest</th>
+      <td>0.983051</td>
+      <td>0.818182</td>
     </tr>
     <tr>
-      <th>weighted_support_vector_machine</th>
-      <td>0.928571</td>
-      <td>0.700000</td>
+      <th>upsampled_support_vector_machine</th>
+      <td>0.950820</td>
+      <td>0.782609</td>
     </tr>
     <tr>
       <th>stacked_logistic_regression</th>
-      <td>0.949153</td>
+      <td>0.950820</td>
       <td>0.818182</td>
     </tr>
   </tbody>
@@ -12979,7 +13104,7 @@ for container in base_meta_learner_performance_comparison_F1_plot.containers:
 
 
     
-![png](output_318_0.png)
+![png](output_319_0.png)
     
 
 
@@ -13050,7 +13175,15 @@ base_meta_learner_performance_comparison_all_plot
       <td>0.931306</td>
     </tr>
     <tr>
-      <th>weighted_decision_tree</th>
+      <th>upsampled_logistic_regression</th>
+      <td>0.918367</td>
+      <td>0.900000</td>
+      <td>0.750000</td>
+      <td>0.818182</td>
+      <td>0.861486</td>
+    </tr>
+    <tr>
+      <th>upsampled_decision_tree</th>
       <td>0.897959</td>
       <td>0.769231</td>
       <td>0.833333</td>
@@ -13058,20 +13191,20 @@ base_meta_learner_performance_comparison_all_plot
       <td>0.876126</td>
     </tr>
     <tr>
-      <th>weighted_random_forest</th>
-      <td>0.897959</td>
-      <td>0.888889</td>
-      <td>0.666667</td>
-      <td>0.761905</td>
-      <td>0.819820</td>
+      <th>upsampled_random_forest</th>
+      <td>0.918367</td>
+      <td>0.900000</td>
+      <td>0.750000</td>
+      <td>0.818182</td>
+      <td>0.861486</td>
     </tr>
     <tr>
-      <th>weighted_support_vector_machine</th>
-      <td>0.877551</td>
-      <td>0.875000</td>
-      <td>0.583333</td>
-      <td>0.700000</td>
-      <td>0.778153</td>
+      <th>upsampled_support_vector_machine</th>
+      <td>0.897959</td>
+      <td>0.818182</td>
+      <td>0.750000</td>
+      <td>0.782609</td>
+      <td>0.847973</td>
     </tr>
     <tr>
       <th>stacked_logistic_regression</th>
@@ -13094,7 +13227,7 @@ base_meta_learner_performance_comparison_all_plot
 # model performance measures
 # between train and test sets
 ##################################
-base_meta_learner_performance_comparison_all_plot = base_meta_learner_performance_comparison_all_plot.plot.barh(figsize=(10, 6),width=0.90)
+base_meta_learner_performance_comparison_all_plot = base_meta_learner_performance_comparison_all_plot.plot.barh(figsize=(10, 9),width=0.90)
 base_meta_learner_performance_comparison_all_plot.set_xlim(0.00,1.00)
 base_meta_learner_performance_comparison_all_plot.set_title("Model Comparison by Score Performance on Test Data")
 base_meta_learner_performance_comparison_all_plot.set_xlabel("Score Performance")
@@ -13107,7 +13240,7 @@ for container in base_meta_learner_performance_comparison_all_plot.containers:
 
 
     
-![png](output_321_0.png)
+![png](output_322_0.png)
     
 
 
@@ -13117,13 +13250,14 @@ for container in base_meta_learner_performance_comparison_all_plot.containers:
 # Plotting the confusion matrices
 # for all the Support Vector Machine models
 ##################################
-classifiers = {"weighted_logistic_regression": weighted_logistic_regression,
-               "weighted_decision_tree": weighted_decision_tree,
-               "weighted_random_forest": weighted_random_forest,
-               "weighted_support_vector_machine": weighted_support_vector_machine,
-               "stacked_logistic_regression": stacked_logistic_regression}
+classifiers = {"upsampled_logistic_regression": upsampled_logistic_regression,
+               "upsampled_decision_tree": upsampled_decision_tree,
+               "upsampled_random_forest": upsampled_random_forest,
+               "upsampled_support_vector_machine": upsampled_support_vector_machine,
+               "stacked_logistic_regression": stacked_logistic_regression,
+               "weighted_logistic_regression": weighted_logistic_regression,}
 
-fig, axes = plt.subplots(2, 4, figsize=(20, 10))
+fig, axes = plt.subplots(2, 3, figsize=(20, 10))
 axes = axes.ravel()
 for i, (key, classifier) in enumerate(classifiers.items()):
     y_pred = classifier.predict(X_test)
@@ -13140,7 +13274,7 @@ plt.show()
 
 
     
-![png](output_322_0.png)
+![png](output_323_0.png)
     
 
 

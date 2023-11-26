@@ -173,7 +173,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split, GridSearchCV
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import CondensedNearestNeighbour
@@ -10237,6 +10237,37 @@ for container in logistic_regression_performance_comparison_F1_plot.containers:
 
 ```python
 ##################################
+# Plotting the confusion matrices
+# for all the Logistic Regression models
+##################################
+classifiers = {"optimal_logistic_regression": optimal_logistic_regression,
+               "weighted_logistic_regression": weighted_logistic_regression,
+               "upsampled_logistic_regression": upsampled_logistic_regression,
+               "downsampled_logistic_regression": downsampled_logistic_regression}
+
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+for i, (key, classifier) in enumerate(classifiers.items()):
+    y_pred = classifier.predict(X_test)
+    cf_matrix = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(cf_matrix)
+    disp.plot(ax=axes[i], xticks_rotation=0)
+    disp.ax_.grid(False)
+    disp.ax_.set_title(key)
+    disp.im_.colorbar.remove()
+
+fig.colorbar(disp.im_, ax=axes)
+plt.show()
+```
+
+
+    
+![png](output_289_0.png)
+    
+
+
+
+```python
+##################################
 # Consolidating all the
 # Decision Tree
 # model performance measures
@@ -10664,7 +10695,38 @@ for container in decision_tree_performance_comparison_F1_plot.containers:
 
 
     
-![png](output_292_0.png)
+![png](output_293_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the confusion matrices
+# for all the Decision Tree models
+##################################
+classifiers = {"optimal_decision_tree": optimal_decision_tree,
+               "weighted_decision_tree": weighted_decision_tree,
+               "upsampled_decision_tree": upsampled_decision_tree,
+               "downsampled_decision_tree": downsampled_decision_tree}
+
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+for i, (key, classifier) in enumerate(classifiers.items()):
+    y_pred = classifier.predict(X_test)
+    cf_matrix = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(cf_matrix)
+    disp.plot(ax=axes[i], xticks_rotation=0)
+    disp.ax_.grid(False)
+    disp.ax_.set_title(key)
+    disp.im_.colorbar.remove()
+
+fig.colorbar(disp.im_, ax=axes)
+plt.show()
+```
+
+
+    
+![png](output_294_0.png)
     
 
 
@@ -11098,7 +11160,38 @@ for container in random_forest_performance_comparison_F1_plot.containers:
 
 
     
-![png](output_296_0.png)
+![png](output_298_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the confusion matrices
+# for all the Random Forest models
+##################################
+classifiers = {"optimal_random_forest": optimal_random_forest,
+               "weighted_random_forest": weighted_random_forest,
+               "upsampled_random_forest": upsampled_random_forest,
+               "downsampled_random_forest": downsampled_random_forest}
+
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+for i, (key, classifier) in enumerate(classifiers.items()):
+    y_pred = classifier.predict(X_test)
+    cf_matrix = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(cf_matrix)
+    disp.plot(ax=axes[i], xticks_rotation=0)
+    disp.ax_.grid(False)
+    disp.ax_.set_title(key)
+    disp.im_.colorbar.remove()
+
+fig.colorbar(disp.im_, ax=axes)
+plt.show()
+```
+
+
+    
+![png](output_299_0.png)
     
 
 
@@ -11532,7 +11625,38 @@ for container in support_vector_machine_performance_comparison_F1_plot.container
 
 
     
-![png](output_300_0.png)
+![png](output_303_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the confusion matrices
+# for all the Support Vector Machine models
+##################################
+classifiers = {"optimal_support_vector_machine": optimal_support_vector_machine,
+               "weighted_support_vector_machine": weighted_support_vector_machine,
+               "upsampled_support_vector_machine": upsampled_support_vector_machine,
+               "downsampled_support_vector_machine": downsampled_support_vector_machine}
+
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+for i, (key, classifier) in enumerate(classifiers.items()):
+    y_pred = classifier.predict(X_test)
+    cf_matrix = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(cf_matrix)
+    disp.plot(ax=axes[i], xticks_rotation=0)
+    disp.ax_.grid(False)
+    disp.ax_.set_title(key)
+    disp.im_.colorbar.remove()
+
+fig.colorbar(disp.im_, ax=axes)
+plt.show()
+```
+
+
+    
+![png](output_304_0.png)
     
 
 
@@ -12354,7 +12478,7 @@ for container in base_meta_learner_performance_comparison_F1_plot.containers:
 
 
     
-![png](output_314_0.png)
+![png](output_318_0.png)
     
 
 
@@ -12482,7 +12606,40 @@ for container in base_meta_learner_performance_comparison_all_plot.containers:
 
 
     
-![png](output_317_0.png)
+![png](output_321_0.png)
+    
+
+
+
+```python
+##################################
+# Plotting the confusion matrices
+# for all the Support Vector Machine models
+##################################
+classifiers = {"weighted_logistic_regression": weighted_logistic_regression,
+               "weighted_decision_tree": weighted_decision_tree,
+               "weighted_random_forest": weighted_random_forest,
+               "weighted_support_vector_machine": weighted_support_vector_machine,
+               "stacked_logistic_regression": stacked_logistic_regression}
+
+fig, axes = plt.subplots(2, 4, figsize=(20, 10))
+axes = axes.ravel()
+for i, (key, classifier) in enumerate(classifiers.items()):
+    y_pred = classifier.predict(X_test)
+    cf_matrix = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(cf_matrix)
+    disp.plot(ax=axes[i], xticks_rotation=0)
+    disp.ax_.grid(False)
+    disp.ax_.set_title(key)
+    disp.im_.colorbar.remove()
+
+fig.colorbar(disp.im_, ax=axes)
+plt.show()
+```
+
+
+    
+![png](output_322_0.png)
     
 
 

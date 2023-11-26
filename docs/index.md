@@ -5329,6 +5329,18 @@ display(cancer_rate_preprocessed_categorical_summary.sort_values(by=['ChiSquare.
 
 ### 1.6.1 Premodelling Data Description <a class="anchor" id="1.6.1"></a>
 
+1. Among the 9 numeric variables determined to have a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 7 were retained with absolute T-Test statistics greater than 5. 
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
+2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
+    * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+
 
 ```python
 ##################################
@@ -5501,6 +5513,34 @@ def model_performance_evaluation(y_true, y_pred):
 ### 1.6.2 Logistic Regression <a class="anchor" id="1.6.2"></a>
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+1. The [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">penalty</span> = penalty norm made to vary between L1 and L2
+    * <span style="color: #FF0000">solver</span> = algorithm used in the optimization problem made to vary between Saga and Liblinear
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+    * <span style="color: #FF0000">max_iter</span> = maximum number of iterations taken for the solvers to converge held constant at a value of 500
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">C</span> = 1
+    * <span style="color: #FF0000">penalty</span> = L1 norm
+    * <span style="color: #FF0000">solver</span> = Liblinear
+    * <span style="color: #FF0000">class_weight</span> = None
+    * <span style="color: #FF0000">max_iter</span> = 500
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9473
+    * **Precision** = 0.8709
+    * **Recall** = 0.9310
+    * **F1 Score** = 0.9000
+    * **AUROC** = 0.9419
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.8889
+    * **Recall** = 0.6667
+    * **F1 Score** = 0.7619
+    * **AUROC** = 0.8198
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
 
 
 ```python
@@ -5734,6 +5774,32 @@ display(optimal_logistic_regression_performance_test)
 
 [Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
 
+1. The [decision tree model](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html) from the <mark style="background-color: #CCECFF"><b>sklearn.tree</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">criterion</span> = function to measure the quality of a split made to vary between Gini, Entropy and Log-Loss
+    * <span style="color: #FF0000">max_depth</span> = maximum depth of the tree made to vary between 3, 5 and 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = minimum number of samples required to split an internal node made to vary between 3, 5 and 10
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">criterion</span> = Entropy
+    * <span style="color: #FF0000">max_depth</span> = 5
+    * <span style="color: #FF0000">min_samples_leaf</span> = 3
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9736
+    * **Precision** = 1.0000
+    * **Recall** = 0.8965
+    * **F1 Score** = 0.9454
+    * **AUROC** = 0.9482
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8571
+    * **Precision** = 0.8571
+    * **Recall** = 0.5000
+    * **F1 Score** = 0.6315
+    * **AUROC** = 0.7364
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
+
 
 ```python
 ##################################
@@ -5964,6 +6030,36 @@ display(optimal_decision_tree_performance_test)
 
 [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
 
+1. The [random forest model](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#) from the <mark style="background-color: #CCECFF"><b>sklearn.ensemble</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">criterion</span> = function to measure the quality of a split made to vary between Gini, Entropy and Log-Loss
+    * <span style="color: #FF0000">max_depth</span> = maximum depth of the tree made to vary between 3, 5 and 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = minimum number of samples required to split an internal node made to vary between 3, 5 and 10
+    * <span style="color: #FF0000">n_estimators</span> = number of trees in the forest made to vary between 100, 150 and 200
+    * <span style="color: #FF0000">max_features</span> = number of features to consider when looking for the best split made to vary between Sqrt and Log2 of n_estimators
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">criterion</span> = Gini
+    * <span style="color: #FF0000">max_depth</span> = 3
+    * <span style="color: #FF0000">min_samples_leaf</span> = 3
+    * <span style="color: #FF0000">n_estimators</span> = 100
+    * <span style="color: #FF0000">max_features</span> = Sqrt n_estimators
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9561
+    * **Precision** = 0.9285
+    * **Recall** = 0.8965
+    * **F1 Score** = 0.9122
+    * **AUROC** = 0.9365
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8775
+    * **Precision** = 0.8750
+    * **Recall** = 0.5833
+    * **F1 Score** = 0.7000
+    * **AUROC** = 0.7781
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
+
 
 ```python
 ##################################
@@ -5980,7 +6076,7 @@ hyperparameter_grid = {
     'criterion': ['gini','entropy','log_loss'],
     'max_depth': [3,5,7],
     'min_samples_leaf': [3,5,10],
-    'n_estimators': [3,5,7],
+    'n_estimators': [100,150,200],
     'max_features':['sqrt', 'log2'],
     'class_weight': [None],
     'random_state': [88888888]}
@@ -6012,10 +6108,10 @@ optimal_random_forest.best_params_
 
     {'class_weight': None,
      'criterion': 'gini',
-     'max_depth': 5,
-     'max_features': 'log2',
+     'max_depth': 3,
+     'max_features': 'sqrt',
      'min_samples_leaf': 3,
-     'n_estimators': 7,
+     'n_estimators': 100,
      'random_state': 88888888}
 
 
@@ -6070,35 +6166,35 @@ display(optimal_random_forest_performance_train)
     <tr>
       <th>0</th>
       <td>Accuracy</td>
-      <td>0.964912</td>
+      <td>0.956140</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Precision</td>
-      <td>0.931034</td>
+      <td>0.928571</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Recall</td>
-      <td>0.931034</td>
+      <td>0.896552</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>3</th>
       <td>F1</td>
-      <td>0.931034</td>
+      <td>0.912281</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>4</th>
       <td>AUROC</td>
-      <td>0.953753</td>
+      <td>0.936511</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
@@ -6157,35 +6253,35 @@ display(optimal_random_forest_performance_test)
     <tr>
       <th>0</th>
       <td>Accuracy</td>
-      <td>0.897959</td>
+      <td>0.877551</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Precision</td>
-      <td>0.888889</td>
+      <td>0.875000</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Recall</td>
-      <td>0.666667</td>
+      <td>0.583333</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>3</th>
       <td>F1</td>
-      <td>0.761905</td>
+      <td>0.700000</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>4</th>
       <td>AUROC</td>
-      <td>0.819820</td>
+      <td>0.778153</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
@@ -6197,6 +6293,30 @@ display(optimal_random_forest_performance_test)
 ### 1.6.5 Support Vector Machine <a class="anchor" id="1.6.6"></a>
 
 [Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
+
+1. The [support vector machine model](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) from the <mark style="background-color: #CCECFF"><b>sklearn.svm</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">kernel</span> = kernel type to be used in the algorithm made to vary between Linear, Poly, RBF and Sigmoid
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">C</span> = 1
+    * <span style="color: #FF0000">kernel</span> = Poly
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9473
+    * **Precision** = 0.9600
+    * **Recall** = 0.8275
+    * **F1 Score** = 0.8888
+    * **AUROC** = 0.9079
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8571
+    * **Precision** = 0.8571
+    * **Recall** = 0.5000
+    * **F1 Score** = 0.6315
+    * **AUROC** = 0.7364
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
 
 
 ```python
@@ -6425,6 +6545,18 @@ display(optimal_support_vector_machine_performance_test)
 
 ### 1.7.1 Premodelling Data Description <a class="anchor" id="1.7.1"></a>
 
+1. Among the 9 numeric variables determined to have a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 7 were retained with absolute T-Test statistics greater than 5. 
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
+2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
+    * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+
 
 ```python
 ##################################
@@ -6597,6 +6729,34 @@ def model_performance_evaluation(y_true, y_pred):
 ### 1.7.2 Logistic Regression <a class="anchor" id="1.7.2"></a>
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+1. The [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">penalty</span> = penalty norm made to vary between L1 and L2
+    * <span style="color: #FF0000">solver</span> = algorithm used in the optimization problem made to vary between Saga and Liblinear
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of 25-75 between classes 0 and 1
+    * <span style="color: #FF0000">max_iter</span> = maximum number of iterations taken for the solvers to converge held constant at a value of 500
+3. The original data reflecting a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">C</span> = 1
+    * <span style="color: #FF0000">penalty</span> = L1 norm
+    * <span style="color: #FF0000">solver</span> = Liblinear
+    * <span style="color: #FF0000">class_weight</span> = 25-75 between classes 0 and 1
+    * <span style="color: #FF0000">max_iter</span> = 500
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.8947
+    * **Precision** = 0.7073
+    * **Recall** = 1.0000
+    * **F1 Score** = 0.8285
+    * **AUROC** = 0.9294
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.9387
+    * **Precision** = 0.8461
+    * **Recall** = 0.9167
+    * **F1 Score** = 0.8800
+    * **AUROC** = 0.9313
+7. Considerable difference in the apparent and independent test model performance observed, indicative of the presence of moderate model overfitting.
 
 
 ```python
@@ -6830,6 +6990,32 @@ display(weighted_logistic_regression_performance_test)
 
 [Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
 
+1. The [decision tree model](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html) from the <mark style="background-color: #CCECFF"><b>sklearn.tree</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">criterion</span> = function to measure the quality of a split made to vary between Gini, Entropy and Log-Loss
+    * <span style="color: #FF0000">max_depth</span> = maximum depth of the tree made to vary between 3, 5 and 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = minimum number of samples required to split an internal node made to vary between 3, 5 and 10
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of 25-75 between classes 0 and 1
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">criterion</span> = Gini
+    * <span style="color: #FF0000">max_depth</span> = 3
+    * <span style="color: #FF0000">min_samples_leaf</span> = 3
+    * <span style="color: #FF0000">class_weight</span> = 25-75 between classes 0 and 1
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9736
+    * **Precision** = 1.0000
+    * **Recall** = 0.8965
+    * **F1 Score** = 0.9454
+    * **AUROC** = 0.9482
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8571
+    * **Precision** = 0.8571
+    * **Recall** = 0.5000
+    * **F1 Score** = 0.6315
+    * **AUROC** = 0.7364
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
+
 
 ```python
 ##################################
@@ -7060,6 +7246,36 @@ display(weighted_decision_tree_performance_test)
 
 [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
 
+1. The [random forest model](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#) from the <mark style="background-color: #CCECFF"><b>sklearn.ensemble</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">criterion</span> = function to measure the quality of a split made to vary between Gini, Entropy and Log-Loss
+    * <span style="color: #FF0000">max_depth</span> = maximum depth of the tree made to vary between 3, 5 and 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = minimum number of samples required to split an internal node made to vary between 3, 5 and 10
+    * <span style="color: #FF0000">n_estimators</span> = number of trees in the forest made to vary between 100, 150 and 200
+    * <span style="color: #FF0000">max_features</span> = number of features to consider when looking for the best split made to vary between Sqrt and Log2 of n_estimators
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of 25-75 between classes 0 and 1
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">criterion</span> = Gini
+    * <span style="color: #FF0000">max_depth</span> = 5
+    * <span style="color: #FF0000">min_samples_leaf</span> = 3
+    * <span style="color: #FF0000">n_estimators</span> = 100
+    * <span style="color: #FF0000">max_features</span> = Sqrt n_estimators
+    * <span style="color: #FF0000">class_weight</span> = 25-75 between classes 0 and 1
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9736
+    * **Precision** = 0.9062
+    * **Recall** = 1.0000
+    * **F1 Score** = 0.9508
+    * **AUROC** = 0.9823
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.8888
+    * **Recall** = 0.6666
+    * **F1 Score** = 0.7619
+    * **AUROC** = 0.8198
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
+
 
 ```python
 ##################################
@@ -7076,7 +7292,7 @@ hyperparameter_grid = {
     'criterion': ['gini','entropy','log_loss'],
     'max_depth': [3,5,7],
     'min_samples_leaf': [3,5,10],
-    'n_estimators': [3,5,7],
+    'n_estimators': [100,150,200],
     'max_features':['sqrt', 'log2'],
     'class_weight': [{0:0.25, 1:0.75}],
     'random_state': [88888888]}
@@ -7107,11 +7323,11 @@ weighted_random_forest.best_params_
 
 
     {'class_weight': {0: 0.25, 1: 0.75},
-     'criterion': 'entropy',
-     'max_depth': 3,
+     'criterion': 'gini',
+     'max_depth': 5,
      'max_features': 'sqrt',
-     'min_samples_leaf': 5,
-     'n_estimators': 3,
+     'min_samples_leaf': 3,
+     'n_estimators': 100,
      'random_state': 88888888}
 
 
@@ -7166,35 +7382,35 @@ display(weighted_random_forest_performance_train)
     <tr>
       <th>0</th>
       <td>Accuracy</td>
-      <td>0.929825</td>
+      <td>0.973684</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Precision</td>
-      <td>0.800000</td>
+      <td>0.906250</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Recall</td>
-      <td>0.965517</td>
+      <td>1.000000</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>3</th>
       <td>F1</td>
-      <td>0.875000</td>
+      <td>0.950820</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>4</th>
       <td>AUROC</td>
-      <td>0.941582</td>
+      <td>0.982353</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
@@ -7253,35 +7469,35 @@ display(weighted_random_forest_performance_test)
     <tr>
       <th>0</th>
       <td>Accuracy</td>
-      <td>0.938776</td>
+      <td>0.897959</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Precision</td>
-      <td>0.909091</td>
+      <td>0.888889</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Recall</td>
-      <td>0.833333</td>
+      <td>0.666667</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>3</th>
       <td>F1</td>
-      <td>0.869565</td>
+      <td>0.761905</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>4</th>
       <td>AUROC</td>
-      <td>0.903153</td>
+      <td>0.819820</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
@@ -7293,6 +7509,30 @@ display(weighted_random_forest_performance_test)
 ### 1.7.5 Support Vector Machine <a class="anchor" id="1.7.6"></a>
 
 [Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
+
+1. The [support vector machine model](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) from the <mark style="background-color: #CCECFF"><b>sklearn.svm</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">kernel</span> = kernel type to be used in the algorithm made to vary between Linear, Poly, RBF and Sigmoid
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of 25-75 between classes 0 and 1
+3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">C</span> = 1
+    * <span style="color: #FF0000">kernel</span> = Poly
+    * <span style="color: #FF0000">class_weight</span> = 25-75 between classes 0 and 1
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9649
+    * **Precision** = 0.9629
+    * **Recall** = 0.8965
+    * **F1 Score** = 0.9285
+    * **AUROC** = 0.9423
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8775
+    * **Precision** = 0.8750
+    * **Recall** = 0.5833
+    * **F1 Score** = 0.7000
+    * **AUROC** = 0.7781
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
 
 
 ```python
@@ -7520,7 +7760,21 @@ display(weighted_support_vector_machine_performance_test)
 
 ## 1.8. Model Development With SMOTE Upsampling <a class="anchor" id="1.8"></a>
 
+[Synthetic Minority Oversampling Technique](https://dl.acm.org/doi/10.5555/1622407.1622416) is specifically designed to increase the representation of the minority class by generating new minority instances between existing instances. The new instances created are not just the copy of existing minority cases, instead for each minority class instance, the algorithm generates synthetic examples by creating linear combinations of the feature vectors between that instance and its k nearest neighbors. The synthetic samples are placed along the line segments connecting the original instance to its neighbors.
+
 ### 1.8.1 Premodelling Data Description <a class="anchor" id="1.8.1"></a>
+
+1. Among the 9 numeric variables determined to have a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 7 were retained with absolute T-Test statistics greater than 5. 
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
+2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
+    * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
+3. The extended model training data by upsampling the minority HIGH <span style="color: #FF0000">CANRAT</span> category applying SMOTE was used. 
 
 
 ```python
@@ -7738,6 +7992,34 @@ def model_performance_evaluation(y_true, y_pred):
 ### 1.8.2 Logistic Regression <a class="anchor" id="1.8.2"></a>
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+1. The [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">penalty</span> = penalty norm made to vary between L1 and L2
+    * <span style="color: #FF0000">solver</span> = algorithm used in the optimization problem made to vary between Saga and Liblinear
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+    * <span style="color: #FF0000">max_iter</span> = maximum number of iterations taken for the solvers to converge held constant at a value of 500
+3. The extended model training data by upsampling the minority HIGH <span style="color: #FF0000">CANRAT</span> category was used. 
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">C</span> = 1
+    * <span style="color: #FF0000">penalty</span> = L1 norm
+    * <span style="color: #FF0000">solver</span> = Saga
+    * <span style="color: #FF0000">class_weight</span> = None
+    * <span style="color: #FF0000">max_iter</span> = 500
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9649
+    * **Precision** = 0.9032
+    * **Recall** = 0.9655
+    * **F1 Score** = 0.9333
+    * **AUROC** = 0.9651
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.9183
+    * **Precision** = 0.9000
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.8181
+    * **AUROC** = 0.8614
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
 
 
 ```python
@@ -7971,6 +8253,32 @@ display(upsampled_logistic_regression_performance_test)
 
 [Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
 
+1. The [decision tree model](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html) from the <mark style="background-color: #CCECFF"><b>sklearn.tree</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">criterion</span> = function to measure the quality of a split made to vary between Gini, Entropy and Log-Loss
+    * <span style="color: #FF0000">max_depth</span> = maximum depth of the tree made to vary between 3, 5 and 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = minimum number of samples required to split an internal node made to vary between 3, 5 and 10
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The extended model training data by upsampling the minority HIGH <span style="color: #FF0000">CANRAT</span> category was used. 
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">criterion</span> = Entropy
+    * <span style="color: #FF0000">max_depth</span> = 3
+    * <span style="color: #FF0000">min_samples_leaf</span> = 5
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9210
+    * **Precision** = 0.7631
+    * **Recall** = 1.0000
+    * **F1 Score** = 0.8656
+    * **AUROC** = 0.9470
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.7692
+    * **Recall** = 0.8333
+    * **F1 Score** = 0.8000
+    * **AUROC** = 0.8761
+7. Considerable difference in the apparent and independent test model performance observed, indicative of the presence of moderate model overfitting.
+
 
 ```python
 ##################################
@@ -8201,6 +8509,36 @@ display(upsampled_decision_tree_performance_test)
 
 [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
 
+1. The [random forest model](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#) from the <mark style="background-color: #CCECFF"><b>sklearn.ensemble</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">criterion</span> = function to measure the quality of a split made to vary between Gini, Entropy and Log-Loss
+    * <span style="color: #FF0000">max_depth</span> = maximum depth of the tree made to vary between 3, 5 and 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = minimum number of samples required to split an internal node made to vary between 3, 5 and 10
+    * <span style="color: #FF0000">n_estimators</span> = number of trees in the forest made to vary between 100, 150 and 200
+    * <span style="color: #FF0000">max_features</span> = number of features to consider when looking for the best split made to vary between Sqrt and Log2 of n_estimators
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The extended model training data by upsampling the minority HIGH <span style="color: #FF0000">CANRAT</span> category was used. 
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">criterion</span> = Entropy
+    * <span style="color: #FF0000">max_depth</span> = 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = 3
+    * <span style="color: #FF0000">n_estimators</span> = 100
+    * <span style="color: #FF0000">max_features</span> = Sqrt n_estimators
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9912
+    * **Precision** = 0.9666
+    * **Recall** = 1.0000
+    * **F1 Score** = 0.9830
+    * **AUROC** = 0.9941
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.9183
+    * **Precision** = 0.9000
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.8181
+    * **AUROC** = 0.8614
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
+
 
 ```python
 ##################################
@@ -8217,7 +8555,7 @@ hyperparameter_grid = {
     'criterion': ['gini','entropy','log_loss'],
     'max_depth': [3,5,7],
     'min_samples_leaf': [3,5,10],
-    'n_estimators': [3,5,7],
+    'n_estimators': [100,150,200],
     'max_features':['sqrt', 'log2'],
     'class_weight': [None],
     'random_state': [88888888]}
@@ -8252,7 +8590,7 @@ upsampled_random_forest.best_params_
      'max_depth': 7,
      'max_features': 'sqrt',
      'min_samples_leaf': 3,
-     'n_estimators': 7,
+     'n_estimators': 100,
      'random_state': 88888888}
 
 
@@ -8307,14 +8645,14 @@ display(upsampled_random_forest_performance_train)
     <tr>
       <th>0</th>
       <td>Accuracy</td>
-      <td>0.982456</td>
+      <td>0.991228</td>
       <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Precision</td>
-      <td>0.935484</td>
+      <td>0.966667</td>
       <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
@@ -8328,14 +8666,14 @@ display(upsampled_random_forest_performance_train)
     <tr>
       <th>3</th>
       <td>F1</td>
-      <td>0.966667</td>
+      <td>0.983051</td>
       <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>4</th>
       <td>AUROC</td>
-      <td>0.988235</td>
+      <td>0.994118</td>
       <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
@@ -8434,6 +8772,30 @@ display(upsampled_random_forest_performance_test)
 ### 1.8.5 Support Vector Machine <a class="anchor" id="1.8.6"></a>
 
 [Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
+
+1. The [support vector machine model](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) from the <mark style="background-color: #CCECFF"><b>sklearn.svm</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">kernel</span> = kernel type to be used in the algorithm made to vary between Linear, Poly, RBF and Sigmoid
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The extended model training data by upsampling the minority HIGH <span style="color: #FF0000">CANRAT</span> category was used. 
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">C</span> = 1
+    * <span style="color: #FF0000">kernel</span> = Linear
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9736
+    * **Precision** = 0.9062
+    * **Recall** = 1.0000
+    * **F1 Score** = 0.9508
+    * **AUROC** = 0.9823
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.8181
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.7826
+    * **AUROC** = 0.8479
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
 
 
 ```python
@@ -8658,7 +9020,21 @@ display(upsampled_support_vector_machine_performance_test)
 
 ## 1.9. Model Development With CNN Downsampling <a class="anchor" id="1.9"></a>
 
+[Condensed Nearest Neighbors](https://ieeexplore.ieee.org/document/1054155) is a prototype selection algorithm that aims to select a subset of instances from the original dataset, discarding redundant and less informative instances. The algorithm works by iteratively adding instances to the subset, starting with an empty set. At each iteration, an instance is added if it is not correctly classified by the current subset. The decision to add or discard an instance is based on its performance on a k-nearest neighbors classifier. If an instance is misclassified by the current subset's k-nearest neighbors, it is added to the subset. The process is repeated until no new instances are added to the subset. The resulting subset is a condensed representation of the dataset that retains the essential information needed for classification.
+
 ### 1.9.1 Premodelling Data Description <a class="anchor" id="1.9.1"></a>
+
+1. Among the 9 numeric variables determined to have a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 7 were retained with absolute T-Test statistics greater than 5. 
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
+2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
+    * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
+3. The reduced model training data by downsampling the majority LOW <span style="color: #FF0000">CANRAT</span> category applying CNN was used.
 
 
 ```python
@@ -8876,6 +9252,34 @@ def model_performance_evaluation(y_true, y_pred):
 ### 1.9.2 Logistic Regression <a class="anchor" id="1.9.2"></a>
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
+
+1. The [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">penalty</span> = penalty norm made to vary between L1 and L2
+    * <span style="color: #FF0000">solver</span> = algorithm used in the optimization problem made to vary between Saga and Liblinear
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+    * <span style="color: #FF0000">max_iter</span> = maximum number of iterations taken for the solvers to converge held constant at a value of 500
+3. The reduced model training data by downsampling the majority LOW <span style="color: #FF0000">CANRAT</span> category was used.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">C</span> = 1
+    * <span style="color: #FF0000">penalty</span> = L1 norm
+    * <span style="color: #FF0000">solver</span> = Liblinear
+    * <span style="color: #FF0000">class_weight</span> = None
+    * <span style="color: #FF0000">max_iter</span> = 500
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9473
+    * **Precision** = 0.8484
+    * **Recall** = 0.9655
+    * **F1 Score** = 0.9032
+    * **AUROC** = 0.9533
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.9183
+    * **Precision** = 0.9000
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.8181
+    * **AUROC** = 0.8614
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
 
 
 ```python
@@ -9109,6 +9513,32 @@ display(downsampled_logistic_regression_performance_test)
 
 [Decision trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) create a model that predicts the class label of a sample based on input features. A decision tree consists of nodes that represent decisions or choices, edges which connect nodes and represent the possible outcomes of a decision and leaf (or terminal) nodes which represent the final decision or the predicted class label. The decision-making process involves feature selection (at each internal node, the algorithm decides which feature to split on based on a certain criterion including gini impurity or entropy), splitting criteria (the splitting criteria aim to find the feature and its corresponding threshold that best separates the data into different classes. The goal is to increase homogeneity within each resulting subset), recursive splitting (the process of feature selection and splitting continues recursively, creating a tree structure. The dataset is partitioned at each internal node based on the chosen feature, and the process repeats for each subset) and stopping criteria (the recursion stops when a certain condition is met, known as a stopping criterion. Common stopping criteria include a maximum depth for the tree, a minimum number of samples required to split a node, or a minimum number of samples in a leaf node.)
 
+1. The [decision tree model](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html) from the <mark style="background-color: #CCECFF"><b>sklearn.tree</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">criterion</span> = function to measure the quality of a split made to vary between Gini, Entropy and Log-Loss
+    * <span style="color: #FF0000">max_depth</span> = maximum depth of the tree made to vary between 3, 5 and 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = minimum number of samples required to split an internal node made to vary between 3, 5 and 10
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The reduced model training data by downsampling the majority LOW <span style="color: #FF0000">CANRAT</span> category was used.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">criterion</span> = Gini
+    * <span style="color: #FF0000">max_depth</span> = 3
+    * <span style="color: #FF0000">min_samples_leaf</span> = 5
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9385
+    * **Precision** = 0.9230
+    * **Recall** = 0.8275
+    * **F1 Score** = 0.8727
+    * **AUROC** = 0.9020
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.8888
+    * **Recall** = 0.6666
+    * **F1 Score** = 0.7619
+    * **AUROC** = 0.8198
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
+
 
 ```python
 ##################################
@@ -9339,6 +9769,36 @@ display(downsampled_decision_tree_performance_test)
 
 [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) is an ensemble learning method made up of a large set of small decision trees called estimators, with each producing its own prediction. The random forest model aggregates the predictions of the estimators to produce a more accurate prediction. The algorithm involves bootstrap aggregating (where smaller subsets of the training data are repeatedly subsampled with replacement), random subspacing (where a subset of features are sampled and used to train each individual estimator), estimator training (where unpruned decision trees are formulated for each estimator) and inference by aggregating the predictions of all estimators.
 
+1. The [random forest model](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#) from the <mark style="background-color: #CCECFF"><b>sklearn.ensemble</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">criterion</span> = function to measure the quality of a split made to vary between Gini, Entropy and Log-Loss
+    * <span style="color: #FF0000">max_depth</span> = maximum depth of the tree made to vary between 3, 5 and 7
+    * <span style="color: #FF0000">min_samples_leaf</span> = minimum number of samples required to split an internal node made to vary between 3, 5 and 10
+    * <span style="color: #FF0000">n_estimators</span> = number of trees in the forest made to vary between 100, 150 and 200
+    * <span style="color: #FF0000">max_features</span> = number of features to consider when looking for the best split made to vary between Sqrt and Log2 of n_estimators
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The reduced model training data by downsampling the majority LOW <span style="color: #FF0000">CANRAT</span> category was used.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">criterion</span> = Gini
+    * <span style="color: #FF0000">max_depth</span> = 3
+    * <span style="color: #FF0000">min_samples_leaf</span> = 3
+    * <span style="color: #FF0000">n_estimators</span> = 100
+    * <span style="color: #FF0000">max_features</span> = Sqrt n_estimators
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9649
+    * **Precision** = 0.9032
+    * **Recall** = 0.9655
+    * **F1 Score** = 0.9333
+    * **AUROC** = 0.9651
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.8888
+    * **Recall** = 0.6666
+    * **F1 Score** = 0.7619
+    * **AUROC** = 0.8198
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
+
 
 ```python
 ##################################
@@ -9355,7 +9815,7 @@ hyperparameter_grid = {
     'criterion': ['gini','entropy','log_loss'],
     'max_depth': [3,5,7],
     'min_samples_leaf': [3,5,10],
-    'n_estimators': [3,5,7],
+    'n_estimators': [100,150,200],
     'max_features':['sqrt', 'log2'],
     'class_weight': [None],
     'random_state': [88888888]}
@@ -9386,11 +9846,11 @@ downsampled_random_forest.best_params_
 
 
     {'class_weight': None,
-     'criterion': 'entropy',
+     'criterion': 'gini',
      'max_depth': 3,
      'max_features': 'sqrt',
      'min_samples_leaf': 3,
-     'n_estimators': 5,
+     'n_estimators': 100,
      'random_state': 88888888}
 
 
@@ -9445,35 +9905,35 @@ display(downsampled_random_forest_performance_train)
     <tr>
       <th>0</th>
       <td>Accuracy</td>
-      <td>0.947368</td>
+      <td>0.964912</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Precision</td>
-      <td>0.870968</td>
+      <td>0.903226</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Recall</td>
-      <td>0.931034</td>
+      <td>0.965517</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>3</th>
       <td>F1</td>
-      <td>0.900000</td>
+      <td>0.933333</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>4</th>
       <td>AUROC</td>
-      <td>0.941988</td>
+      <td>0.965112</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
@@ -9572,6 +10032,30 @@ display(downsampled_random_forest_performance_test)
 ### 1.9.5 Support Vector Machine <a class="anchor" id="1.9.6"></a>
 
 [Support Vector Machine](https://dl.acm.org/doi/10.1145/130385.130401) plots each observation in an N-dimensional space corresponding to the number of features in the data set and finds a hyperplane that maximally separates the different classes by a maximally large margin (which is defined as the distance between the hyperplane and the closest data points from each class). The algorithm applies kernel transformation by mapping non-linearly separable data using the similarities between the points in a high-dimensional feature space for improved discrimination.
+
+1. The [support vector machine model](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) from the <mark style="background-color: #CCECFF"><b>sklearn.svm</b></mark> Python library API was implemented. 
+2. The model contains 5 hyperparameters:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">kernel</span> = kernel type to be used in the algorithm made to vary between Linear, Poly, RBF and Sigmoid
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of None
+3. The reduced model training data by downsampling the majority LOW <span style="color: #FF0000">CANRAT</span> category was used.
+4. Hyperparameter tuning was conducted using the 5-fold cross-validation method with optimal model performance using the F1 score determined for: 
+    * <span style="color: #FF0000">C</span> = 1
+    * <span style="color: #FF0000">kernel</span> = Linear
+    * <span style="color: #FF0000">class_weight</span> = None
+5. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9561
+    * **Precision** = 0.9285
+    * **Recall** = 0.8965
+    * **F1 Score** = 0.9122
+    * **AUROC** = 0.9365
+6. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.8979
+    * **Precision** = 0.8888
+    * **Recall** = 0.6666
+    * **F1 Score** = 0.7619
+    * **AUROC** = 0.8198
+7. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
 
 
 ```python
@@ -10782,154 +11266,154 @@ display(random_forest_performance_comparison)
     <tr>
       <th>0</th>
       <td>Accuracy</td>
-      <td>0.964912</td>
+      <td>0.956140</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Precision</td>
-      <td>0.931034</td>
+      <td>0.928571</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Recall</td>
-      <td>0.931034</td>
+      <td>0.896552</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>3</th>
       <td>F1</td>
-      <td>0.931034</td>
+      <td>0.912281</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>4</th>
       <td>AUROC</td>
-      <td>0.953753</td>
+      <td>0.936511</td>
       <td>optimal_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>5</th>
       <td>Accuracy</td>
-      <td>0.897959</td>
+      <td>0.877551</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>6</th>
       <td>Precision</td>
-      <td>0.888889</td>
+      <td>0.875000</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>7</th>
       <td>Recall</td>
-      <td>0.666667</td>
+      <td>0.583333</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>8</th>
       <td>F1</td>
-      <td>0.761905</td>
+      <td>0.700000</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>9</th>
       <td>AUROC</td>
-      <td>0.819820</td>
+      <td>0.778153</td>
       <td>optimal_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>10</th>
       <td>Accuracy</td>
-      <td>0.929825</td>
+      <td>0.973684</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>11</th>
       <td>Precision</td>
-      <td>0.800000</td>
+      <td>0.906250</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>12</th>
       <td>Recall</td>
-      <td>0.965517</td>
+      <td>1.000000</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>13</th>
       <td>F1</td>
-      <td>0.875000</td>
+      <td>0.950820</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>14</th>
       <td>AUROC</td>
-      <td>0.941582</td>
+      <td>0.982353</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>15</th>
       <td>Accuracy</td>
-      <td>0.938776</td>
+      <td>0.897959</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>16</th>
       <td>Precision</td>
-      <td>0.909091</td>
+      <td>0.888889</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>17</th>
       <td>Recall</td>
-      <td>0.833333</td>
+      <td>0.666667</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>18</th>
       <td>F1</td>
-      <td>0.869565</td>
+      <td>0.761905</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>19</th>
       <td>AUROC</td>
-      <td>0.903153</td>
+      <td>0.819820</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>20</th>
       <td>Accuracy</td>
-      <td>0.982456</td>
+      <td>0.991228</td>
       <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>21</th>
       <td>Precision</td>
-      <td>0.935484</td>
+      <td>0.966667</td>
       <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
@@ -10943,14 +11427,14 @@ display(random_forest_performance_comparison)
     <tr>
       <th>23</th>
       <td>F1</td>
-      <td>0.966667</td>
+      <td>0.983051</td>
       <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>24</th>
       <td>AUROC</td>
-      <td>0.988235</td>
+      <td>0.994118</td>
       <td>upsampled_random_forest</td>
       <td>train</td>
     </tr>
@@ -10992,35 +11476,35 @@ display(random_forest_performance_comparison)
     <tr>
       <th>30</th>
       <td>Accuracy</td>
-      <td>0.947368</td>
+      <td>0.964912</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>31</th>
       <td>Precision</td>
-      <td>0.870968</td>
+      <td>0.903226</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>32</th>
       <td>Recall</td>
-      <td>0.931034</td>
+      <td>0.965517</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>33</th>
       <td>F1</td>
-      <td>0.900000</td>
+      <td>0.933333</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>34</th>
       <td>AUROC</td>
-      <td>0.941988</td>
+      <td>0.965112</td>
       <td>downsampled_random_forest</td>
       <td>train</td>
     </tr>
@@ -11116,22 +11600,22 @@ random_forest_performance_comparison_F1_plot
   <tbody>
     <tr>
       <th>optimal_random_forest</th>
-      <td>0.931034</td>
-      <td>0.761905</td>
+      <td>0.912281</td>
+      <td>0.700000</td>
     </tr>
     <tr>
       <th>weighted_random_forest</th>
-      <td>0.875000</td>
-      <td>0.869565</td>
+      <td>0.950820</td>
+      <td>0.761905</td>
     </tr>
     <tr>
       <th>upsampled_random_forest</th>
-      <td>0.966667</td>
+      <td>0.983051</td>
       <td>0.818182</td>
     </tr>
     <tr>
       <th>downsampled_random_forest</th>
-      <td>0.900000</td>
+      <td>0.933333</td>
       <td>0.761905</td>
     </tr>
   </tbody>
@@ -11664,6 +12148,28 @@ plt.show()
 
 [Logistic Regression](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=360300) models the relationship between the probability of an event (among two outcome levels) by having the log-odds of the event be a linear combination of a set of predictors weighted by their respective parameter estimates. The parameters are estimated via maximum likelihood estimation by testing different values through multiple iterations to optimize for the best fit of log odds. All of these iterations produce the log likelihood function, and logistic regression seeks to maximize this function to find the best parameter estimates. Given the optimal parameters, the conditional probabilities for each observation can be calculated, logged, and summed together to yield a predicted probability.
 
+1. The [logistic regression model](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) from the <mark style="background-color: #CCECFF"><b>sklearn.linear_model</b></mark> Python library API was implemented. 
+2. The model used default hyperparameters with no tuning applied:
+    * <span style="color: #FF0000">C</span> = inverse of regularization strength held constant at a value of 1
+    * <span style="color: #FF0000">penalty</span> = penalty norm held constant at a value of L2
+    * <span style="color: #FF0000">solver</span> = algorithm used in the optimization problem held constant at a value of Lbfgs
+    * <span style="color: #FF0000">class_weight</span> = weights associated with classes held constant at a value of 25-75 between classes 0 and 1
+    * <span style="color: #FF0000">max_iter</span> = maximum number of iterations taken for the solvers to converge held constant at a value of 500
+3. The original data reflecting a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
+4. The apparent model performance of the optimal model is summarized as follows:
+    * **Accuracy** = 0.9736
+    * **Precision** = 0.9333
+    * **Recall** = 0.9655
+    * **F1 Score** = 0.9491
+    * **AUROC** = 0.9709
+5. The independent test model performance of the final model is summarized as follows:
+    * **Accuracy** = 0.9183
+    * **Precision** = 0.9000
+    * **Recall** = 0.7500
+    * **F1 Score** = 0.8181
+    * **AUROC** = 0.8614
+6. High difference in the apparent and independent test model performance observed, indicative of the presence of excessive model overfitting.
+
 
 ```python
 ##################################
@@ -11683,11 +12189,11 @@ base_learners = [('LR', LogisticRegression(C=1.0,
                                               min_samples_leaf=3,
                                               random_state=88888888)),
                 ('RF', RandomForestClassifier(class_weight={0: 0.25, 1: 0.75},
-                                              criterion='entropy',
-                                              max_depth=3,
+                                              criterion='gini',
+                                              max_depth=5,
                                               max_features='sqrt',
-                                              min_samples_leaf=5,
-                                              n_estimators=3,
+                                              min_samples_leaf=3,
+                                              n_estimators=100,
                                               random_state=88888888)),
                ('SVM', SVC(class_weight={0: 0.25, 1: 0.75},
                            C=1.0,
@@ -11743,10 +12249,8 @@ stacked_logistic_regression.fit(X_train, y_train)
                                (&#x27;RF&#x27;,
                                 RandomForestClassifier(class_weight={0: 0.25,
                                                                      1: 0.75},
-                                                       criterion=&#x27;entropy&#x27;,
-                                                       max_depth=3,
-                                                       min_samples_leaf=5,
-                                                       n_estimators=3,
+                                                       max_depth=5,
+                                                       min_samples_leaf=3,
                                                        random_state=88888888)),
                                (&#x27;SVM&#x27;,
                                 SVC(class_weight={0: 0.25, 1: 0.75},
@@ -11769,10 +12273,8 @@ stacked_logistic_regression.fit(X_train, y_train)
                                (&#x27;RF&#x27;,
                                 RandomForestClassifier(class_weight={0: 0.25,
                                                                      1: 0.75},
-                                                       criterion=&#x27;entropy&#x27;,
-                                                       max_depth=3,
-                                                       min_samples_leaf=5,
-                                                       n_estimators=3,
+                                                       max_depth=5,
+                                                       min_samples_leaf=3,
                                                        random_state=88888888)),
                                (&#x27;SVM&#x27;,
                                 SVC(class_weight={0: 0.25, 1: 0.75},
@@ -11782,9 +12284,8 @@ stacked_logistic_regression.fit(X_train, y_train)
                                                       max_iter=500,
                                                       random_state=88888888))</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>LR</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(class_weight={0: 0.25, 1: 0.75}, max_iter=500,
                    random_state=88888888, solver=&#x27;liblinear&#x27;)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>DT</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">DecisionTreeClassifier</label><div class="sk-toggleable__content"><pre>DecisionTreeClassifier(class_weight={0: 0.25, 1: 0.75}, max_depth=3,
-                       min_samples_leaf=3, random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>RF</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestClassifier</label><div class="sk-toggleable__content"><pre>RandomForestClassifier(class_weight={0: 0.25, 1: 0.75}, criterion=&#x27;entropy&#x27;,
-                       max_depth=3, min_samples_leaf=5, n_estimators=3,
-                       random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>SVM</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label sk-toggleable__label-arrow">SVC</label><div class="sk-toggleable__content"><pre>SVC(class_weight={0: 0.25, 1: 0.75}, kernel=&#x27;poly&#x27;, random_state=88888888)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>final_estimator</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox" ><label for="sk-estimator-id-6" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(class_weight={0: 0.25, 1: 0.75}, max_iter=500,
+                       min_samples_leaf=3, random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>RF</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestClassifier</label><div class="sk-toggleable__content"><pre>RandomForestClassifier(class_weight={0: 0.25, 1: 0.75}, max_depth=5,
+                       min_samples_leaf=3, random_state=88888888)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>SVM</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label sk-toggleable__label-arrow">SVC</label><div class="sk-toggleable__content"><pre>SVC(class_weight={0: 0.25, 1: 0.75}, kernel=&#x27;poly&#x27;, random_state=88888888)</pre></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>final_estimator</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox" ><label for="sk-estimator-id-6" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression(class_weight={0: 0.25, 1: 0.75}, max_iter=500,
                    random_state=88888888)</pre></div></div></div></div></div></div></div></div></div></div></div></div>
 
 
@@ -12165,70 +12666,70 @@ display(base_meta_learner_performance_comparison)
     <tr>
       <th>20</th>
       <td>Accuracy</td>
-      <td>0.929825</td>
+      <td>0.973684</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>21</th>
       <td>Precision</td>
-      <td>0.800000</td>
+      <td>0.906250</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>22</th>
       <td>Recall</td>
-      <td>0.965517</td>
+      <td>1.000000</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>23</th>
       <td>F1</td>
-      <td>0.875000</td>
+      <td>0.950820</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>24</th>
       <td>AUROC</td>
-      <td>0.941582</td>
+      <td>0.982353</td>
       <td>weighted_random_forest</td>
       <td>train</td>
     </tr>
     <tr>
       <th>25</th>
       <td>Accuracy</td>
-      <td>0.938776</td>
+      <td>0.897959</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>26</th>
       <td>Precision</td>
-      <td>0.909091</td>
+      <td>0.888889</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>27</th>
       <td>Recall</td>
-      <td>0.833333</td>
+      <td>0.666667</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>28</th>
       <td>F1</td>
-      <td>0.869565</td>
+      <td>0.761905</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
     <tr>
       <th>29</th>
       <td>AUROC</td>
-      <td>0.903153</td>
+      <td>0.819820</td>
       <td>weighted_random_forest</td>
       <td>test</td>
     </tr>
@@ -12439,8 +12940,8 @@ base_meta_learner_performance_comparison_F1_plot
     </tr>
     <tr>
       <th>weighted_random_forest</th>
-      <td>0.875000</td>
-      <td>0.869565</td>
+      <td>0.950820</td>
+      <td>0.761905</td>
     </tr>
     <tr>
       <th>weighted_support_vector_machine</th>
@@ -12558,11 +13059,11 @@ base_meta_learner_performance_comparison_all_plot
     </tr>
     <tr>
       <th>weighted_random_forest</th>
-      <td>0.938776</td>
-      <td>0.909091</td>
-      <td>0.833333</td>
-      <td>0.869565</td>
-      <td>0.903153</td>
+      <td>0.897959</td>
+      <td>0.888889</td>
+      <td>0.666667</td>
+      <td>0.761905</td>
+      <td>0.819820</td>
     </tr>
     <tr>
       <th>weighted_support_vector_machine</th>
@@ -12714,6 +13215,8 @@ plt.show()
 * **[Publication]** [Classification and Regression Trees](https://www.semanticscholar.org/paper/Classification-and-Regression-Trees-Breiman-Friedman/8017699564136f93af21575810d557dba1ee6fc6) by Leo Breiman, Jerome Friedman, Richard Olshen and Charles Stone (Computer Science)
 * **[Publication]** [Random Forest](https://link.springer.com/article/10.1023/A:1010933404324) by Leo Breiman (Machine Learning)
 * **[Publication]** [A Training Algorithm for Optimal Margin Classifiers](https://dl.acm.org/doi/10.1145/130385.130401) by Bernhard Boser, Isabelle Guyon and Vladimir Vapnik (Proceedings of the Fifth Annual Workshop on Computational Learning Theory)
+* **[Publication]** [SMOTE: Synthetic Minority Over-Sampling Technique](https://dl.acm.org/doi/10.5555/1622407.1622416) by Nitesh Chawla, Kevin Bowyer, Lawrence Hall and Philip Kegelmeyer (Journal of Artificial Intelligence Research)
+* **[Publication]** [The Condensed Nearest Neighbor Rule](https://ieeexplore.ieee.org/document/1054155) by Peter Hart (IEEE Transactions on Information Theory)
 
 ***
 

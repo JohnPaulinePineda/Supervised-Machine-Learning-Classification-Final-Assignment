@@ -13280,6 +13280,8 @@ plt.show()
 
 # 2. Summary <a class="anchor" id="Summary"></a>
 
+A detailed [report](https://github.com/JohnPaulinePineda/Supervised-Machine-Learning-Classification-Final-Assignment/blob/main/SupervisedMachineLearningClassificationCapstone_JohnPaulinePineda.pdf) was formulated documenting all the analysis steps and findings.
+
 
 ![ClassificationProject_Introduction.png](attachment:612f4f3b-d395-4e06-9c89-94f21f74a8b5.png)
 

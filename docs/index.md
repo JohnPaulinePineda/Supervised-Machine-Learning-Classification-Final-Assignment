@@ -2,7 +2,7 @@
 # Supervised Learning : Exploring Classification Models for Predicting Categorical Responses
 
 ***
-### John Pauline Pineda <br> <br> *November 29, 2023*
+### John Pauline Pineda <br> <br> *November 27, 2023*
 ***
 
 * [**1. Table of Contents**](#TOC)
@@ -13281,6 +13281,26 @@ plt.show()
 # 2. Summary <a class="anchor" id="Summary"></a>
 
 
+![ClassificationProject_Introduction.png](attachment:612f4f3b-d395-4e06-9c89-94f21f74a8b5.png)
+
+![ClassificationProject_Methodology.png](attachment:51d9c845-1be8-4159-9d7d-21552f54670b.png)
+
+![ClassificationProject__DataGathering.png](attachment:ab03d9cf-348a-4cc1-936c-94d2b21d78b9.png)
+
+![ClassificationProject_DataDescription.png](attachment:470e12c0-563c-432f-8487-15b1ecfd0e62.png)
+
+![ClassificationProject__DataQualityAssessment.png](attachment:38f6c1b0-180d-491f-9e31-006c250cdb17.png)
+
+![ClassificationProject__DataPreprocessing.png](attachment:329095ec-e099-4f84-bf88-3643b20526ce.png)
+
+![ClassificationProject__DataExploration.png](attachment:6ae5530c-7057-4d1b-a105-b57edeae3b2b.png)
+
+![ClassificationProject_ModelDevelopment.png](attachment:1c61c4c4-ecae-41aa-a871-f495965874db.png)
+
+![ClassificationProject_OverallFindingsAndImplications.png](attachment:7fbcb828-8b87-4648-88ac-b0f7bd76ca39.png)
+
+![ClassificationProject_OverallConclusion.png](attachment:61bf1d35-0b74-4323-a4ec-59d81efba302.png)
+
 # 3. References <a class="anchor" id="References"></a>
 
 * **[Book]** [Data Preparation for Machine Learning: Data Cleaning, Feature Selection, and Data Transforms in Python](https://machinelearningmastery.com/data-preparation-for-machine-learning/) by Jason Brownlee
@@ -13303,6 +13323,13 @@ plt.show()
 * **[Python Library API]** [sklearn.linear_model](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.linear_model) by Scikit-Learn Team
 * **[Python Library API]** [sklearn.preprocessing](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing) by Scikit-Learn Team
 * **[Python Library API]** [scipy](https://docs.scipy.org/doc/scipy/) by SciPy Team
+* **[Python Library API]** [sklearn.tree](https://scikit-learn.org/stable/modules/tree.html) by Scikit-Learn Team
+* **[Python Library API]** [sklearn.ensemble](https://scikit-learn.org/stable/modules/ensemble.html) by Scikit-Learn Team
+* **[Python Library API]** [sklearn.svm](https://scikit-learn.org/stable/modules/svm.html) by Scikit-Learn Team
+* **[Python Library API]** [sklearn.metrics](https://scikit-learn.org/stable/modules/model_evaluation.html) by Scikit-Learn Team
+* **[Python Library API]** [sklearn.model_selection](https://scikit-learn.org/stable/model_selection.html) by Scikit-Learn Team
+* **[Python Library API]** [imblearn.over_sampling](https://imbalanced-learn.org/stable/over_sampling.html) by Imbalanced-Learn Team
+* **[Python Library API]** [imblearn.under_sampling](https://imbalanced-learn.org/stable/under_sampling.html) by Imbalanced-Learn Team
 * **[Article]** [Step-by-Step Exploratory Data Analysis (EDA) using Python](https://www.analyticsvidhya.com/blog/2022/07/step-by-step-exploratory-data-analysis-eda-using-python/#:~:text=Exploratory%20Data%20Analysis%20(EDA)%20with,distributions%20using%20Python%20programming%20language.) by Malamahadevan Mahadevan (Analytics Vidhya)
 * **[Article]** [Exploratory Data Analysis in Python — A Step-by-Step Process](https://towardsdatascience.com/exploratory-data-analysis-in-python-a-step-by-step-process-d0dfa6bf94ee) by Andrea D'Agostino (Towards Data Science)
 * **[Article]** [Exploratory Data Analysis with Python](https://medium.com/@douglas.rochedo/exploratory-data-analysis-with-python-78b6c1d479cc) by Douglas Rocha (Medium)

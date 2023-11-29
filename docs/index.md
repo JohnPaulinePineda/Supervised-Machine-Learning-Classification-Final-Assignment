@@ -5104,15 +5104,15 @@ plt.show()
     * **Null**: Difference in the means between groups LOW and HIGH is equal to zero  
     * **Alternative**: Difference in the means between groups LOW and HIGH is not equal to zero   
 2. There is sufficient evidence to conclude of a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable in 9 of the 12 numeric predictors given their high t-test statistic values with reported low p-values less than the significance level of 0.05.
-    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
-    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
-    * <span style="color: #FF0000">POPGRO</span>: T.Test.Statistic=+4.905, Correlation.PValue=0.000
-    * <span style="color: #FF0000">GHGEMI</span>: T.Test.Statistic=-2.243, Correlation.PValue=0.026
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, T.Test.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, T.Test.PValue=0.000   
+    * <span style="color: #FF0000">POPGRO</span>: T.Test.Statistic=+4.905, T.Test.PValue=0.000
+    * <span style="color: #FF0000">GHGEMI</span>: T.Test.Statistic=-2.243, T.Test.PValue=0.026
 3. The relationship between the categorical predictors to the <span style="color: #FF0000">CANRAT</span> target variable was statistically evaluated using the following hypotheses:
     * **Null**: The categorical predictor is independent of the categorical target variable 
     * **Alternative**: The categorical predictor is dependent of the categorical target variable    
@@ -5330,13 +5330,13 @@ display(cancer_rate_preprocessed_categorical_summary.sort_values(by=['ChiSquare.
 ### 1.6.1 Premodelling Data Description <a class="anchor" id="1.6.1"></a>
 
 1. Among the 9 numeric variables determined to have a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 7 were retained with absolute T-Test statistics greater than 5. 
-    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
-    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, T.Test.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, T.Test.PValue=0.000   
 2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
     * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
 3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
@@ -6546,13 +6546,13 @@ display(optimal_support_vector_machine_performance_test)
 ### 1.7.1 Premodelling Data Description <a class="anchor" id="1.7.1"></a>
 
 1. Among the 9 numeric variables determined to have a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 7 were retained with absolute T-Test statistics greater than 5. 
-    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
-    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, T.Test.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, T.Test.PValue=0.000     
 2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
     * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
 3. The original data which reflect a 3:1 class imbalance between the LOW and HIGH <span style="color: #FF0000">CANRAT</span> categories was used for model training and testing.
@@ -7765,13 +7765,13 @@ display(weighted_support_vector_machine_performance_test)
 ### 1.8.1 Premodelling Data Description <a class="anchor" id="1.8.1"></a>
 
 1. Among the 9 numeric variables determined to have a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 7 were retained with absolute T-Test statistics greater than 5. 
-    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
-    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, T.Test.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, T.Test.PValue=0.000   
 2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
     * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
 3. The [SMOTE](https://imbalanced-learn.org/stable/references/generated/imblearn.over_sampling.SMOTE.html) algorithm from the <mark style="background-color: #CCECFF"><b>imblearn.over_sampling</b></mark> Python library API was implemented. The extended model training data by upsampling the minority HIGH <span style="color: #FF0000">CANRAT</span> category applying SMOTE was used. 
@@ -9025,13 +9025,13 @@ display(upsampled_support_vector_machine_performance_test)
 ### 1.9.1 Premodelling Data Description <a class="anchor" id="1.9.1"></a>
 
 1. Among the 9 numeric variables determined to have a statistically significant difference between the means of the numeric measurements obtained from LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 7 were retained with absolute T-Test statistics greater than 5. 
-    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, Correlation.PValue=0.000
-    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, Correlation.PValue=0.000 
-    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, Correlation.PValue=0.000  
-    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, Correlation.PValue=0.000   
+    * <span style="color: #FF0000">GDPCAP</span>: T.Test.Statistic=-11.937, T.Test.PValue=0.000
+    * <span style="color: #FF0000">EPISCO</span>: T.Test.Statistic=-11.789, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">LIFEXP</span>: T.Test.Statistic=-10.979, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">TUBINC</span>: T.Test.Statistic=+9.609, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">DTHCMD</span>: T.Test.Statistic=+8.376, T.Test.PValue=0.000 
+    * <span style="color: #FF0000">CO2EMI</span>: T.Test.Statistic=-7.031, T.Test.PValue=0.000  
+    * <span style="color: #FF0000">URBPOP</span>: T.Test.Statistic=-6.541, T.Test.PValue=0.000    
 2. Among the 4 categorical predictors determined to have a statistically significant relationship difference between the categories of the categorical predictors and the LOW and HIGH groups of the <span style="color: #FF0000">CANRAT</span> target variable, only 1 was retained with absolute Chi-Square statistics greater than 15.
     * <span style="color: #FF0000">HDICAT_VH</span>: ChiSquare.Test.Statistic=76.764, ChiSquare.Test.PValue=0.000
 3. The [CNN](https://imbalanced-learn.org/stable/references/generated/imblearn.under_sampling.CondensedNearestNeighbour.html) algorithm from the <mark style="background-color: #CCECFF"><b>imblearn.under_sampling</b></mark> Python library API was implemented. The reduced model training data by downsampling the majority LOW <span style="color: #FF0000">CANRAT</span> category applying CNN was used.
